@@ -12,11 +12,10 @@ class AVLNode {
 public:
   int key;
   T value;
-  AVLNode* left; // Pointer to the left child
-  AVLNode* right; // Pointer to the right child
-  int height; // Height of the node in the tree
+  AVLNode* left;
+  AVLNode* right;
+  int height;
 
-  // Constructor to initialize a node with a given key
   AVLNode(T k):key(k),left(nullptr),right(nullptr),height(1){}
 };
 
@@ -25,27 +24,35 @@ class AVLTree<T> {
 private:
   AVLNode<T>* root;
 
-
+  //Zagoury
   bool rotateLeft(AVLNode<T> *node);
+
+  //Nitay
   bool rotateRight(AVLNode<T> *node);
 
+  //Zagoury
   int height(AVLNode<T>* node);
 
+  //Nitay
   int balanceFactor(AVLNode<T>* node);
 
-public:
-  AVLTree<T>();
-
-  ~AVLTree<T>();
-
-  bool insert(T data);
-
+  //Zagoury
   AVLNode<T>* minValueNode(AVLNode<T>* node)
 
+public:
+  AVLTree<T>():root(nullptr){};
+
+  //Nitay
+  ~AVLTree<T>();
+
+  //Nitay
+  bool insert(T data);
+
+  //Zagoury
   T search(T data);
 
+  //Nitay
   bool delete(T data);
-
 };
 
 
