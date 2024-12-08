@@ -17,7 +17,11 @@ public:
   shared_ptr<AVLNode<T>> right_child;
   int height;
 
-  AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
+  explicit AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
+
+  T data() {
+    return value;
+  }
 
 };
 
@@ -35,7 +39,7 @@ private:
   //Zagoury
   int height(AVLNode<T>* node);
 
-  //Nitay
+  //Nitay V
   int balanceFactor(AVLNode<T>* node);
 
   //Zagoury
@@ -44,20 +48,23 @@ private:
   //Nitay V
   shared_ptr<AVLNode<T>> insert(shared_ptr<AVLNode<T>> node, T data);
 
+  //Nitay
+  shared_ptr<AVLNode<T>> deleteNode(shared_ptr<AVLNode<T>> node, T data);
+
 public:
   AVLTree<T>():root(nullptr){};
 
   //Nitay
   ~AVLTree<T>();
 
-  //Nitay
+  //Nitay V
   bool insert(T data);
 
   //Zagoury
   T search(T data);
 
   //Nitay
-  bool deleteTree(T data);
+  bool deleteNode(T data);
 };
 
 
@@ -91,6 +98,77 @@ bool AVLTree<T>::insert(T data){
   }
 
 }
+
+template<class T>
+bool AVLTree<T>::deleteNode(T data) {
+  if (this->root == nullptr) return false;
+
+  if (this->root->data() == data) {
+    this->root = nullptr;
+    return true;
+  }
+
+  if (this->root->data() > data) return deleteNode(this->root->left(), data);
+
+  return deleteNode(this->root->right(), data);
+}
+
+template<class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T data) {
+  if (node == nullptr) return false;
+
+  if (node->data() > data) {
+    node->left = deleteNode(node->left, data);
+  } else if (node->data() < data) {
+    node->right = deleteNode(node->right, data);
+  } else {
+    if (node->left == nullptr || node->right == nullptr) {
+      shared_ptr<AVLNode<T>> subTree = node->left== nullptr ? node->right: node->left;
+      //if it has no child
+      if (subTree == nullptr) {
+        subTree = node;
+        node = nullptr;
+      } else {
+        // if it has 1 child
+        node = subTree;
+      }
+    } else {
+      // Node has 2 children
+      // switch between the smallest right son and node
+      shared_ptr<AVLNode<T>> smallest_right_successor = minValueNode(node->right);
+      node->data = smallest_right_successor->data;
+      node->right = deleteNode(node->right, smallest_right_successor->data);
+    }
+
+    if (node == nullptr) return nullptr;
+
+    // Get balance factor
+    node->height = 1 + max(height(node->left), height(node->right));
+    int balance = balanceFactor(node);
+
+    // Rotate if needed:
+
+    // LL
+    if (balance > 1 && balanceFactor(node->left) >= 0) return rotateRight(node);
+
+    // RR
+    if (balance < -1 && balanceFactor(node->right) <= 0) return rotateLeft(node);
+
+    // LR
+    if (balance > 1 && balanceFactor(node->left) < 0) {
+      node->left = rotateLeft(node->left);
+      return rotateRight(node);
+    }
+
+    // RL
+    if (balance < -1 && balanceFactor(node->right) > 0) {
+      node->right = rotateRight(node->right);
+      return rotateLeft(node);
+    }
+  }
+  return node;
+}
+
 
 template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
