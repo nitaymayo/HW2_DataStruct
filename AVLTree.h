@@ -19,12 +19,6 @@ public:
 
   AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
 
-  shared_ptr<AVLNode<T>> left() const{
-    return left;
-  }
-  shared_ptr<AVLNode<T>> right() const{
-    return right;
-  }
 };
 
 template<class T>
@@ -35,7 +29,7 @@ private:
   //Zagoury
   shared_ptr<AVLNode<T>> rotateLeft(AVLNode<T> *node);
 
-  //Nitay
+  //Nitay V
   shared_ptr<AVLNode<T>> rotateRight(AVLNode<T> *node);
 
   //Zagoury
@@ -119,22 +113,39 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
   //Check the need for rotations:
 
   //  RR
-  if (nodeBalanceFactor < -1 && data > node->right()->data()){
+  if (nodeBalanceFactor < -1 && data > node->right->data()){
     return rotateLeft(node);
     // LL
-  } else if (nodeBalanceFactor > 1 && data < node->left()->data()){
+  } else if (nodeBalanceFactor > 1 && data < node->left->data()){
     return rotateRight(node);
     // RL
   } else if (nodeBalanceFactor < -1 && data < node->right->data()){
     node->right = rightRotate(node->right);
     return leftRotate(node);
     // LR
-  } else if (nodeBalanceFactor > 1 && data > node->left()->data()){
+  } else if (nodeBalanceFactor > 1 && data > node->left->data()){
     node->right = leftRotate(node->left);
     return rightRotate(node);
   } else {
     return node;
   }
+}
+
+
+template<class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::rotateRight(AVLNode<T> *node) {
+  //make rotation
+  shared_ptr<AVLNode<T>> LRsubTree = node->right()->left();
+  shared_ptr<AVLNode<T>> LNode = node->right();
+
+  node->left = LRsubTree;
+  LNode->right = node;
+
+  //update heights
+  node->height = 1 + max(height(node->left()), height(node->right()));
+  LNode->height = 1 + max(height(node->left()), height(node->right()));
+
+  return LNode;
 }
 
 
