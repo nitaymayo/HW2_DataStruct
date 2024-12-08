@@ -4,25 +4,33 @@
 
 #ifndef AVLTREE_H
 #define AVLTREE_H
+#include <iostream>
+#include <memory>
 
-
+using namespace std;
 
 template<class T>
 class AVLNode {
 public:
-  int key;
   T value;
-  AVLNode* left;
-  AVLNode* right;
+  shared_ptr<AVLNode<T>> left_child;
+  shared_ptr<AVLNode<T>> right_child;
   int height;
 
-  AVLNode(T k):key(k),left(nullptr),right(nullptr),height(1){}
+  AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
+
+  shared_ptr<AVLNode<T>> left() const{
+    return left;
+  }
+  shared_ptr<AVLNode<T>> right() const{
+    return right;
+  }
 };
 
 template<class T>
-class AVLTree<T> {
+class AVLTree {
 private:
-  AVLNode<T>* root;
+  shared_ptr<AVLNode<T>> root;
 
   //Zagoury
   bool rotateLeft(AVLNode<T> *node);
@@ -37,7 +45,10 @@ private:
   int balanceFactor(AVLNode<T>* node);
 
   //Zagoury
-  AVLNode<T>* minValueNode(AVLNode<T>* node)
+  AVLNode<T>* minValueNode(AVLNode<T>* node);
+
+  //Nitay V
+  shared_ptr<AVLNode<T>> insert(shared_ptr<AVLNode<T>> node, T data);
 
 public:
   AVLTree<T>():root(nullptr){};

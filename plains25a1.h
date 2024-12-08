@@ -14,15 +14,16 @@
 #define PLAINS25WINTER_WET1_H_
 
 #include "wet1util.h"
+#include "AVLTree.h"
 
 class Plains {
 private:
     //
     // Here you may add anything you want
     //
-    AVLTREE<horse> horses;
-    AVLTREE<herd> herds;
-    AVLTREE<herd> empty_herds;
+    AVLTree<horse> horses;
+    AVLTree<herd> herds;
+    AVLTree<herd> empty_herds;
 
     
 public:
