@@ -33,10 +33,10 @@ private:
   shared_ptr<AVLNode<T>> root;
 
   //Zagoury
-  bool rotateLeft(AVLNode<T> *node);
+  shared_ptr<AVLNode<T>> rotateLeft(AVLNode<T> *node);
 
   //Nitay
-  bool rotateRight(AVLNode<T> *node);
+  shared_ptr<AVLNode<T>> rotateRight(AVLNode<T> *node);
 
   //Zagoury
   int height(AVLNode<T>* node);
@@ -63,7 +63,7 @@ public:
   T search(T data);
 
   //Nitay
-  bool delete(T data);
+  bool deleteTree(T data);
 };
 
 
