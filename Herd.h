@@ -5,14 +5,11 @@
 #ifndef HERD_H
 #define HERD_H
 #include <memory>
-#include <Horse.h>
+#include "Horse.h"
 
 class Herd {
     int ID;
-    std::shared_ptr<Horse> leader_horses;
-
-
-
+    //std::shared_ptr<Horse> leader_horses;
 };
 
 

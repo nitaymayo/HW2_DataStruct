@@ -13,21 +13,20 @@ template<class T>
 class AVLNode {
 public:
   T value;
-  shared_ptr<AVLNode<T>> left_child;
-  shared_ptr<AVLNode<T>> right_child;
+  shared_ptr<AVLNode<T>> left;
+  shared_ptr<AVLNode<T>> right;
   int height;
 
-  explicit AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
+  explicit AVLNode(T k):value(k),left(nullptr),right(nullptr),height(1){}
 
   virtual ~AVLNode() {
-    delete left_child.get();
-    delete right_child.get();
+    delete left.get();
+    delete right.get();
   }
 
   T data() {
     return value;
   }
-
 };
 
 template<class T>
@@ -36,16 +35,16 @@ private:
   shared_ptr<AVLNode<T>> root;
 
   //Zagoury
-  shared_ptr<AVLNode<T>> rotateLeft(AVLNode<T> *node);
+  shared_ptr<AVLNode<T>> rotateLeft(shared_ptr<AVLNode<T>> node);
 
   //Nitay V
-  shared_ptr<AVLNode<T>> rotateRight(AVLNode<T> *node);
+  shared_ptr<AVLNode<T>> rotateRight(shared_ptr<AVLNode<T>> node);
 
   //Zagoury
-  int height(AVLNode<T>* node);
+  int height(shared_ptr<AVLNode<T>> node);
 
   //Nitay V
-  int balanceFactor(AVLNode<T>* node);
+  int balanceFactor(shared_ptr<AVLNode<T>> node);
 
   //Zagoury
   AVLNode<T>* minValueNode(AVLNode<T>* node);
@@ -57,11 +56,21 @@ private:
   shared_ptr<AVLNode<T>> deleteNode(shared_ptr<AVLNode<T>> node, T data);
 
 
+
+  void printInorder(shared_ptr<AVLNode<T>> root)
+  {
+    if (root != nullptr) {
+      printInorder(root->left);
+      cout << root->data() << " ";
+      printInorder(root->right);
+    }
+  }
+
 public:
-  AVLTree<T>():root(nullptr){};
+  AVLTree():root(nullptr){};
 
   //Nitay V
-  virtual ~AVLTree<T>() {
+  virtual ~AVLTree() {
     delete root.get();
   };
 
@@ -73,19 +82,18 @@ public:
 
   //Nitay V
   bool deleteNode(T data);
+
+  void printInorder() {
+    if (root != nullptr) {
+      printInorder(root->left);
+      cout << root->data() << " ";
+      printInorder(root->right);
+    }
+  }
 };
 
-
 template<class T>
-int AVLTree<T>::height(AVLNode<T>* node)
-{
-  if (node == nullptr)
-    return 0;
-  return node->height;
-}
-
-template<class T>
-int AVLTree<T>::balanceFactor(AVLNode<T>* node)
+int AVLTree<T>::balanceFactor(shared_ptr<AVLNode<T>> node)
 {
   if (node == nullptr)
     return 0;
@@ -96,15 +104,62 @@ template<class T>
 bool AVLTree<T>::insert(T data){
   if (this->root == nullptr){
     this->root = make_shared<AVLNode<T>>(data);
+    return true;
   }
-  if (this->root.data() > data){
-    this->insert(this->root->left(), data);
-  } else if (this->root.data() < data){
-    this->insert(this->root->right(), data);
-  } else {
+  try {
+    if (this->root->data() > data){
+      this->insert(this->root->left, data);
+    } else if (this->root->data() < data){
+      this->insert(this->root->right, data);
+    } else {
+      return false;
+    }
+  } catch (logic_error &e) {
     return false;
   }
+  return true;
 
+}
+
+template<class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
+  if (node == nullptr){
+    return make_shared<AVLNode<T>>(data);
+  }
+
+  if (node->data() == data) throw logic_error("data already exists");
+
+  // recursive insertion of the new node
+  if (data < node->data())
+    node->left = insert(node->left, data);
+  else if (data > node->data())
+    node->right = insert(node->right, data);
+  else
+    return node;
+
+  //update balance factor of this node
+  node->height = 1 + max(height(node->left), height(node->right));
+  int nodeBalanceFactor = this->balanceFactor(node);
+
+  //Check the need for rotations:
+
+  //  RR
+  if (nodeBalanceFactor < -1 && data > node->right->data()){
+    return rotateLeft(node);
+    // LL
+  } else if (nodeBalanceFactor > 1 && data < node->left->data()){
+    return rotateRight(node);
+    // RL
+  } else if (nodeBalanceFactor < -1 && data < node->right->data()){
+    node->right = rotateRight(node->right);
+    return rotateLeft(node);
+    // LR
+  } else if (nodeBalanceFactor > 1 && data > node->left->data()){
+    node->left = rotateLeft(node->left);
+    return rotateRight(node);
+  } else {
+    return node;
+  }
 }
 
 template<class T>
@@ -179,59 +234,19 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T dat
 
 
 template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
-  if (node == nullptr){
-    return make_shared<AVLNode<T>>(data);
-  }
-
-  // recursive insertion of the new node
-  if (data < node->data())
-    node->left = insert(node->left, data);
-  else if (data > node->data())
-    node->right = insert(node->right, data);
-  else
-    return node;
-
-  //update balance factor of this node
-  node->height = 1 + max(height(node->left()), height(node->right()));
-  int nodeBalanceFactor = this->balanceFactor(node);
-
-  //Check the need for rotations:
-
-  //  RR
-  if (nodeBalanceFactor < -1 && data > node->right->data()){
-    return rotateLeft(node);
-    // LL
-  } else if (nodeBalanceFactor > 1 && data < node->left->data()){
-    return rotateRight(node);
-    // RL
-  } else if (nodeBalanceFactor < -1 && data < node->right->data()){
-    node->right = rightRotate(node->right);
-    return leftRotate(node);
-    // LR
-  } else if (nodeBalanceFactor > 1 && data > node->left->data()){
-    node->right = leftRotate(node->left);
-    return rightRotate(node);
-  } else {
-    return node;
-  }
-}
-
-
-template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::rotateRight(AVLNode<T> *node) {
+shared_ptr<AVLNode<T>> AVLTree<T>::rotateRight(shared_ptr<AVLNode<T>> node) {
   //make rotation
-  shared_ptr<AVLNode<T>> LRsubTree = node->right()->left();
-  shared_ptr<AVLNode<T>> LNode = node->right();
+  shared_ptr<AVLNode<T>> LRsubTree = node->right->left;
+  shared_ptr<AVLNode<T>> left_node = node->right;
 
   node->left = LRsubTree;
-  LNode->right = node;
+  left_node->right = node;
 
   //update heights
-  node->height = 1 + max(height(node->left()), height(node->right()));
-  LNode->height = 1 + max(height(node->left()), height(node->right()));
+  node->height = 1 + max(height(node->left), height(node->right));
+  left_node->height = 1 + max(height(node->left), height(node->right));
 
-  return LNode;
+  return left_node;
 }
 
 

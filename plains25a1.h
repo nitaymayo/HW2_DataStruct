@@ -15,15 +15,17 @@
 
 #include "wet1util.h"
 #include "AVLTree.h"
+#include "Horse.h"
+#include "Herd.h"
 
 class Plains {
 private:
     //
     // Here you may add anything you want
     //
-    AVLTree<horse> horses;
-    AVLTree<herd> herds;
-    AVLTree<herd> empty_herds;
+    AVLTree<Horse> horses;
+    AVLTree<Herd> herds;
+    AVLTree<Herd> empty_herds;
 
     
 public:

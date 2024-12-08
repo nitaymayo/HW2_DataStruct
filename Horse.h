@@ -5,7 +5,7 @@
 #ifndef HORSE_H
 #define HORSE_H
 #include <memory>
-
+#include "Herd.h"
 
 class Horse {
 private:
