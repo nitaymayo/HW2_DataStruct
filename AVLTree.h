@@ -19,6 +19,11 @@ public:
 
   explicit AVLNode(T k):value(k),left_child(nullptr),right_child(nullptr),height(1){}
 
+  virtual ~AVLNode() {
+    delete left_child.get();
+    delete right_child.get();
+  }
+
   T data() {
     return value;
   }
@@ -48,14 +53,17 @@ private:
   //Nitay V
   shared_ptr<AVLNode<T>> insert(shared_ptr<AVLNode<T>> node, T data);
 
-  //Nitay
+  //Nitay V
   shared_ptr<AVLNode<T>> deleteNode(shared_ptr<AVLNode<T>> node, T data);
+
 
 public:
   AVLTree<T>():root(nullptr){};
 
-  //Nitay
-  ~AVLTree<T>();
+  //Nitay V
+  virtual ~AVLTree<T>() {
+    delete root.get();
+  };
 
   //Nitay V
   bool insert(T data);
@@ -63,7 +71,7 @@ public:
   //Zagoury
   T search(T data);
 
-  //Nitay
+  //Nitay V
   bool deleteNode(T data);
 };
 
