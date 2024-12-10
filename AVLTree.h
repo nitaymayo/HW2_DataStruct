@@ -189,17 +189,17 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
   //Check the need for rotations:
 
   //  RR
-  if (nodeBalanceFactor < -1 && data > node->right->data()){
+  if (nodeBalanceFactor == -2 && balanceFactor(node->right) >= 0){
     return rotateLeft(node);
     // LL
-  } else if (nodeBalanceFactor > 1 && data < node->left->data()){
+  } else if (nodeBalanceFactor == 2 && balanceFactor(node->left) <= 0){
     return rotateRight(node);
     // RL
-  } else if (nodeBalanceFactor < -1 && data < node->right->data()){
+  } else if (nodeBalanceFactor == -2 && balanceFactor(node->right) == 1){
     node->right = rotateRight(node->right);
     return rotateLeft(node);
     // LR
-  } else if (nodeBalanceFactor > 1 && data > node->left->data()){
+  } else if (nodeBalanceFactor == 2 && balanceFactor(node->left) == -1){
     node->left = rotateLeft(node->left);
     return rotateRight(node);
   } else {
@@ -268,19 +268,19 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T dat
     // check if rotation is needed - rotate and return new son
 
     // LL
-    if (balance > 1 && balanceFactor(node->left) >= 0) return rotateRight(node);
+    if (balance == 2 && balanceFactor(node->left) >= 0) return rotateRight(node);
 
     // RR
-    if (balance < -1 && balanceFactor(node->right) <= 0) return rotateLeft(node);
+    if (balance == -2 && balanceFactor(node->right) <= 0) return rotateLeft(node);
 
     // LR
-    if (balance > 1 && balanceFactor(node->left) < 0) {
+    if (balance == 2 && balanceFactor(node->left) == -1) {
       node->left = rotateLeft(node->left);
       return rotateRight(node);
     }
 
     // RL
-    if (balance < -1 && balanceFactor(node->right) > 0) {
+    if (balance == -2 && balanceFactor(node->right) == 1) {
       node->right = rotateRight(node->right);
       return rotateLeft(node);
     }
