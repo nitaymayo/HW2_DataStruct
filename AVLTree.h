@@ -124,9 +124,9 @@ shared_ptr<AVLNode<T>> AVLTree<T>::search(T data) {
   try {
     if (this->root->data() == data) return this->root;
 
-    if (this->root->data() > data) return search(this->root->left, data);
+    if (this->root->data() > data) return this->root->left ? search(this->root->left, data) : nullptr;
 
-    return search(this->root->right, data);
+    return this->root->right ? search(this->root->right, data) : nullptr;
   } catch (logic_error &e) {
     return nullptr;
   }
