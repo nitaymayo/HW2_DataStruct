@@ -5,13 +5,13 @@
 #ifndef HERD_H
 #define HERD_H
 #include <memory>
-#include "Horse.h"
+
 
 class Herd {
+    friend class Horse;
     int ID;
-    //std::shared_ptr<Horse> leader_horses;
+    std::shared_ptr<Horse> leader_horses;
+public:
+    Herd(int ID): ID(ID) {}
 };
-
-
-
 #endif //HERD_H
