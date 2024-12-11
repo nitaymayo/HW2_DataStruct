@@ -2,12 +2,11 @@
 // However you need to implement all public Plains function, as provided below as a template
 
 #include "plains25a1.h"
+#include <memory>
 
-
-Plains::Plains()
-{
-    
-}
+Plains::Plains():m_horses(AVLTree<Horse>()),
+                   m_herds(AVLTree<Herd>()),
+                   m_empty_herds(AVLTree<Herd>()){}
 
 Plains::~Plains()
 {
