@@ -68,6 +68,8 @@ private:
     }
   }
 
+  shared_ptr<AVLNode<T>> fixWithRotations(shared_ptr<AVLNode<T>> node);
+
 public:
   AVLTree():root(nullptr){};
 
@@ -144,6 +146,34 @@ shared_ptr<AVLNode<T>> AVLTree<T>::search(shared_ptr<AVLNode<T>> node, T data) {
 }
 
 template<class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::fixWithRotations(shared_ptr<AVLNode<T>> node) {
+
+  // calculate balance factor
+  int nodeBalanceFactor = balanceFactor(node);
+
+  //  RR
+  if (nodeBalanceFactor == -2 && balanceFactor(node->right) >= 0){
+    return rotateLeft(node);
+  }
+  // LL
+  if (nodeBalanceFactor == 2 && balanceFactor(node->left) <= 0){
+    return rotateRight(node);
+  }
+  // RL
+  if (nodeBalanceFactor == -2 && balanceFactor(node->right) == 1){
+    node->right = rotateRight(node->right);
+    return rotateLeft(node);
+  }
+  // LR
+  if (nodeBalanceFactor == 2 && balanceFactor(node->left) == -1){
+    node->left = rotateLeft(node->left);
+    return rotateRight(node);
+  }
+
+  return node;
+}
+
+template<class T>
 bool AVLTree<T>::insert(T data){
   if (this->root == nullptr){
     this->root = make_shared<AVLNode<T>>(data);
@@ -184,27 +214,9 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
 
   //update balance factor of this node
   node->height = 1 + max(height(node->left), height(node->right));
-  int nodeBalanceFactor = this->balanceFactor(node);
 
-  //Check the need for rotations:
-
-  //  RR
-  if (nodeBalanceFactor == -2 && balanceFactor(node->right) >= 0){
-    return rotateLeft(node);
-    // LL
-  } else if (nodeBalanceFactor == 2 && balanceFactor(node->left) <= 0){
-    return rotateRight(node);
-    // RL
-  } else if (nodeBalanceFactor == -2 && balanceFactor(node->right) == 1){
-    node->right = rotateRight(node->right);
-    return rotateLeft(node);
-    // LR
-  } else if (nodeBalanceFactor == 2 && balanceFactor(node->left) == -1){
-    node->left = rotateLeft(node->left);
-    return rotateRight(node);
-  } else {
-    return node;
-  }
+  // fix the node with rotations
+  return fixWithRotations(node);
 }
 
 template<class T>
@@ -263,29 +275,10 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T dat
 
     // Get balance factor
     node->height = 1 + max(height(node->left), height(node->right));
-    int balance = balanceFactor(node);
 
-    // check if rotation is needed - rotate and return new son
-
-    // LL
-    if (balance == 2 && balanceFactor(node->left) >= 0) return rotateRight(node);
-
-    // RR
-    if (balance == -2 && balanceFactor(node->right) <= 0) return rotateLeft(node);
-
-    // LR
-    if (balance == 2 && balanceFactor(node->left) == -1) {
-      node->left = rotateLeft(node->left);
-      return rotateRight(node);
-    }
-
-    // RL
-    if (balance == -2 && balanceFactor(node->right) == 1) {
-      node->right = rotateRight(node->right);
-      return rotateLeft(node);
-    }
   }
-  return node;
+  // fix with rotations and return new root
+  return fixWithRotations(node);
 }
 
 template<class T>
