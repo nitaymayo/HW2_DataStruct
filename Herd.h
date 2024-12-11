@@ -10,8 +10,8 @@
 class Herd {
     friend class Horse;
     int ID;
-    std::shared_ptr<Horse> leader_horses;
 public:
+    std::shared_ptr<AVLNode<Horse>> leader_horses;
     explicit Herd(const int ID): ID(ID) {}
 
     int getID() const {

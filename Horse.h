@@ -11,12 +11,13 @@ class Horse {
 private:
     int ID;
     int speed;
-    std::shared_ptr<Horse> followGroup_next;
-    std::shared_ptr<Horse> followGroup_previous;
-    std::shared_ptr<Horse> first_follower;
-    std::shared_ptr<Herd> herd;
 
 public:
+    std::shared_ptr<AVLNode<Horse>> followGroup_next;
+    std::shared_ptr<AVLNode<Horse>> followGroup_previous;
+    std::shared_ptr<AVLNode<Horse>> first_follower;
+    // std::shared_ptr<AVLNode<Horse>> last_follower;
+    std::shared_ptr<AVLNode<Herd>> herd;
     Horse(const int ID, const int speed): ID(ID), speed(speed) {};
 
     ~Horse() = default;
