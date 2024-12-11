@@ -17,7 +17,7 @@ private:
     std::shared_ptr<Herd> herd;
 
 public:
-    Horse(int ID, int speed): ID(ID), speed(speed) {};
+    Horse(const int ID, const int speed): ID(ID), speed(speed) {};
 
     ~Horse() = default;
 
@@ -28,6 +28,16 @@ public:
         return speed;
     }
 };
+
+inline bool operator==(const Horse &h1, const Horse &h2) {
+    return h1.getID() == h2.getID();
+}
+inline bool operator<(const Horse &h1, const Horse &h2) {
+    return h1.getID() < h2.getID();
+}
+inline bool operator>(const Horse &h1, const Horse &h2) {
+    return h1.getID() > h2.getID();
+}
 
 
 
