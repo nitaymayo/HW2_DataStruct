@@ -11,7 +11,8 @@ class Herd {
     friend class Horse;
     int ID;
 public:
-    std::shared_ptr<AVLNode<Horse>> leader_horses;
+    int counter = 0;
+    std::shared_ptr<AVLNode<Horse>> m_horses;
     explicit Herd(const int ID): ID(ID) {}
 
     int getID() const {

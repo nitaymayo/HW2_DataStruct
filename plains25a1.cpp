@@ -79,9 +79,15 @@ StatusType Plains::join_herd(int horseId, int herdId)
         } 
     }
     try{
-        horse->value.followGroup_next = 
-        herd->value.leader_horses;
-        herd->value.leader_horses = horse;
+        horse->value.herd_next = herd->value.m_horses;
+        if(herd->value.m_horses != nullptr){
+            herd->value.m_horses->value.herd_previous = horse;
+        }
+        herd->value.m_horses = horse;
+        horse->value.herd_previous = nullptr;
+        horse->value.timestamp = herd->value.counter;
+        herd->value.counter++;
+        horse->value.herd = herd;
     }catch(...){
         return StatusType::ALLOCATION_ERROR;
     }
@@ -103,30 +109,34 @@ StatusType Plains::leave_herd(int horseId)
     {
         return StatusType::FAILURE;
     }
-    if (horse->value.first_follower == nullptr)
+    shared_ptr<AVLNode<Herd>> temp_herd = horse->value.herd;
+    if (temp_herd->value.m_horses == horse)
     {
-        if (horse->value.followGroup_previous != nullptr)
-        {
-            if (horse->value.followGroup_previous->value.first_follower 
-                = horse)
-            {
-                horse->value.followGroup_previous->value.first_follower = 
-                horse->value.followGroup_next;
-            }
-            horse->value.followGroup_previous->value.followGroup_next = 
-            horse->value.followGroup_next;
-        }
-        if (horse->value.followGroup_next != nullptr)
-        {
-            horse->value.followGroup_next->value.followGroup_previous = 
-            horse->value.followGroup_previous;
-        }
-        
-        
+        temp_herd->value.m_horses 
+        = temp_herd->value.m_horses->value.herd_next;
     }
-    
-
-
+    if (horse->value.herd_previous!= nullptr)
+    {
+        horse->value.herd_previous->value.herd_next
+         = horse->value.herd_next; 
+    }
+    if (horse->value.herd_next != nullptr)
+    {
+        horse->value.herd_next->value.herd_previous
+         = horse->value.herd_previous; 
+    }
+    horse->value.herd = nullptr;
+    horse->value.leader = nullptr;
+    if (temp_herd->value.m_horses == nullptr)
+    {
+        try{
+            herds.deleteNode(temp_herd->data());
+            empty_herds.insert(temp_herd->data());
+        }catch(...){
+            return StatusType::ALLOCATION_ERROR;
+        }
+    }
+    return StatusType::SUCCESS;
 }
 
 output_t<int> Plains::get_speed(int horseId)
@@ -136,6 +146,26 @@ output_t<int> Plains::get_speed(int horseId)
 
 output_t<bool> Plains::leads(int horseId, int otherHorseId)
 {
+    if(horseId <=0 || otherHorseId <= 0 || horseId == otherHorseId)
+        return StatusType::INVALID_INPUT;
+    Horse h1(horseId, 0);
+    shared_ptr<AVLNode<Horse>> horse = horses.search(h1);
+    Horse h2(otherHorseId, 0);
+    shared_ptr<AVLNode<Horse>> other = horses.search(h2);
+    if (horse == nullptr || other == nullptr)
+    {
+        return StatusType::FAILURE;
+    }
+    if (other->value.herd != horse->value.herd){
+        return false;
+    }
+    while (horse->value.leader != nullptr)
+    {
+        if (horse->value.leader == other){
+            return true;
+        }
+        horse = horse->value.leader;
+    }
     return false;
 }
 

@@ -13,10 +13,10 @@ private:
     int speed;
 
 public:
-    std::shared_ptr<AVLNode<Horse>> followGroup_next;
-    std::shared_ptr<AVLNode<Horse>> followGroup_previous;
-    std::shared_ptr<AVLNode<Horse>> first_follower;
-    // std::shared_ptr<AVLNode<Horse>> last_follower;
+    int timestamp = -1;
+    std::shared_ptr<AVLNode<Horse>> herd_next;
+    std::shared_ptr<AVLNode<Horse>> herd_previous;
+    std::shared_ptr<AVLNode<Horse>> leader;
     std::shared_ptr<AVLNode<Herd>> herd;
     Horse(const int ID, const int speed): ID(ID), speed(speed) {};
 
