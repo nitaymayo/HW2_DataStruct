@@ -12,7 +12,8 @@ class Horse {
 private:
     int ID;
     int speed;
-    std::time_t timestamp;
+    std::time_t join_timestamp;
+    std::time_t following_timestamp;
 
 public:
 
@@ -20,7 +21,7 @@ public:
     std::shared_ptr<AVLNode<Horse>> herd_previous;
     std::shared_ptr<AVLNode<Horse>> leader;
     std::shared_ptr<AVLNode<Herd>> herd;
-    Horse(const int ID, const int speed): ID(ID), speed(speed), timestamp(-1) {};
+    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(-1), following_timestamp(-1) {};
 
     ~Horse() = default;
 
@@ -33,8 +34,15 @@ public:
 
     void follow(const std::shared_ptr<AVLNode<Horse>>& leader) {
         if (leader == nullptr) throw std::invalid_argument("Horse can't be null");
-        time(&timestamp);
+        time(&following_timestamp);
         this->leader = leader;
+    }
+
+    bool joinHerd(const std::shared_ptr<AVLNode<Herd>> &herd) {
+        if (this->herd->value == herd->value) return false;
+        time(&join_timestamp);
+        this->herd = herd;
+        return true;
     }
 };
 
