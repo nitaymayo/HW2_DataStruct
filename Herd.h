@@ -20,6 +20,8 @@ public:
     shared_ptr<MyNode> m_horses;
     explicit Herd(const int ID): ID(ID), counter(0) {}
 
+
+
     int getID() const {
         return ID;
     }
@@ -32,7 +34,9 @@ public:
         horse->value.node = current;
         current->next = m_horses;
         current->previous = nullptr;
-        m_horses->previous = current;
+        if (m_horses != nullptr) {
+            m_horses->previous = current;
+        }
         m_horses = current;
         counter++;
         return true;

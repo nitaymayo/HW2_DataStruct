@@ -42,7 +42,7 @@ public:
     }
 
     std::shared_ptr<AVLNode<Horse>> getLeader() const {
-        if (following_timestamp == leader->value.getTimestamp()) {
+        if (leader != nullptr && following_timestamp == leader->value.getTimestamp()) {
             return leader;
         }
         return nullptr;

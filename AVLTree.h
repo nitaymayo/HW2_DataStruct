@@ -6,7 +6,6 @@
 #define AVLTREE_H
 #include <iostream>
 #include <memory>
-// #include "Horse.h"
 
 
 using namespace std;
@@ -73,7 +72,7 @@ private:
   shared_ptr<AVLNode<T>> fixWithRotations(shared_ptr<AVLNode<T>> node);
 
 public:
-  AVLTree():root(nullptr){};
+  AVLTree():root(){};
 
   //Nitay V
   bool insert(T data);
@@ -123,7 +122,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::minValueNode(shared_ptr<AVLNode<T>> node) {
 
 template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::search(T data) {
-  if (this->root == nullptr) return nullptr;
+  if (!((bool)this->root)) return nullptr;
 
   try {
     if (this->root->data() == data) return this->root;
@@ -229,9 +228,7 @@ bool AVLTree<T>::deleteNode(T data) {
 
     if (this->root->data() == data) {
       this->root = deleteNode(this->root, data);
-    }
-
-    if (this->root->data() > data) {
+    } else if (this->root->data() > data) {
       this->root->left = deleteNode(this->root->left, data);
     } else {
       this->root->right = deleteNode(this->root->right, data);

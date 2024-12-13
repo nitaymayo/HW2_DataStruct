@@ -20,7 +20,9 @@ StatusType Plains::add_herd(int herdId)
   if (herdId <= 0) return StatusType::INVALID_INPUT;
 
   Herd newHerd(herdId);
-  if (herds.search(newHerd) == nullptr) return StatusType::FAILURE;
+  if (herds.search(newHerd) != nullptr &&
+      empty_herds.search(newHerd))
+      return StatusType::FAILURE;
 
   try{
       if (empty_herds.insert(newHerd)) return StatusType::SUCCESS;
@@ -74,13 +76,16 @@ StatusType Plains::join_herd(int horseId, int herdId)
     }
     Herd h1(herdId);
     herd_node_ptr herd = herds.search(h1);
+    // if no herd in herds
     if (herd == nullptr)
     {
+        // check if herd exists in empty_herds
         herd = empty_herds.search(h1);
+        // if not then Failure
         if (herd == nullptr)
         {
             return StatusType::FAILURE;
-        }else{
+        } else {
             try{
                 herds.insert(herd->data());
                 empty_herds.deleteNode(herd->data());
@@ -185,14 +190,17 @@ bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
 bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
                           shared_ptr<MyNode> leader,
                           int chain_count){
+    if (horse->current_horse->value.getLeader() == nullptr) return true;
     while (horse->current_horse->value.getLeader()->value != leader->current_horse->value &&
            horse->chain_num == -1){
 
         if (horse->chain_num == chain_count) return false;
 
         horse->chain_num = chain_count;
-        horse = horse->next;
+        horse = horse->current_horse->value.getLeader()->value.node;
            }
+    horse->chain_num = chain_count;
+    leader->chain_num = chain_count;
     return true;
 }
 
@@ -204,6 +212,8 @@ output_t<bool> Plains::can_run_together(int herdId)
     if (herd == nullptr) return output_t<bool>(StatusType::FAILURE);
 
     shared_ptr<MyNode> a_horse = herd->value.m_horses, leader = nullptr;
+
+    if (herd->value.getCount() == 1) return output_t<bool>(StatusType::SUCCESS);
 
     // find leader and make sure there is only 1
     while (a_horse != nullptr){
@@ -224,7 +234,8 @@ output_t<bool> Plains::can_run_together(int herdId)
     a_horse = herd->value.m_horses;
     while (a_horse != nullptr){
       if (go_over_follow_chain(a_horse, leader, chain_counter)){
-        a_horse = a_horse->next;
+          a_horse = a_horse->next;
+          chain_counter++;
       } else return output_t<bool>(false);
     }
 
