@@ -71,6 +71,9 @@ public:
 inline bool operator==(const Horse &h1, const Horse &h2) {
     return h1.getID() == h2.getID();
 }
+inline bool operator!=(const Horse &h1, const Horse &h2) {
+    return !(h1 == h2);
+}
 inline bool operator<(const Horse &h1, const Horse &h2) {
     return h1.getID() < h2.getID();
 }
