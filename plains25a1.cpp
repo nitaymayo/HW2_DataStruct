@@ -182,18 +182,23 @@ output_t<bool> Plains::leads(int horseId, int otherHorseId)
     {
         return StatusType::FAILURE;
     }
+    return has_leading_chain(horse, other);
+}
+
+bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
     if (other->value.herd != horse->value.herd){
         return false;
     }
-    while (horse->value.leader != nullptr)
+    while (horse->value.getLeader() != nullptr)
     {
-        if (horse->value.leader == other){
+        horse = horse->value.getLeader();
+        if (horse == other){
             return true;
         }
-        horse = horse->value.leader;
     }
     return false;
-}
+ }
+
 
 output_t<bool> Plains::can_run_together(int herdId)
 {
