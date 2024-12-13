@@ -18,6 +18,7 @@ public:
     int getID() const {
         return ID;
     }
+
 };
 
 inline bool operator==(const Herd& lhs, const Herd& rhs) {

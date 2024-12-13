@@ -32,9 +32,20 @@ public:
         return speed;
     }
 
+    std::time_t getTimestamp() const {
+        return join_timestamp;
+    }
+
+    std::shared_ptr<AVLNode<Horse>> getLeader() const {
+        if (following_timestamp == leader->value.getTimestamp()) {
+            return leader;
+        }
+        return nullptr;
+    }
+
     void follow(const std::shared_ptr<AVLNode<Horse>>& leader) {
         if (leader == nullptr) throw std::invalid_argument("Horse can't be null");
-        time(&following_timestamp);
+        following_timestamp = leader->value.getTimestamp();
         this->leader = leader;
     }
 
