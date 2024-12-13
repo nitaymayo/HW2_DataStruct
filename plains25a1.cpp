@@ -3,9 +3,7 @@
 
 #include "plains25a1.h"
 
-typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
-typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
-    
+
 Plains::Plains() : horses(AVLTree<Horse>()),
                    herds(AVLTree<Herd>()),
                    empty_herds(AVLTree<Herd>()){}
@@ -67,13 +65,13 @@ StatusType Plains::join_herd(int horseId, int herdId)
     if(horseId <=0 || herdId <= 0)
         return StatusType::INVALID_INPUT;
     Horse current(horseId, 0);
-    Herd h1(herdId);
-    shared_ptr<AVLNode<Horse>> horse = horses.search(current);
-    if (horse == nullptr || horse->value.herd != nullptr)
+    horse_node_ptr horse = horses.search(current);
+    if (horse == nullptr || horse->value.getHerd() != nullptr)
     {
         return StatusType::FAILURE;
     }
-    shared_ptr<AVLNode<Herd>> herd = herds.search(h1);
+    Herd h1(herdId);
+    herd_node_ptr herd = herds.search(h1);
     if (herd == nullptr)
     {
         herd = empty_herds.search(h1);
@@ -91,15 +89,8 @@ StatusType Plains::join_herd(int horseId, int herdId)
         } 
     }
     try{
-        horse->value.herd_next = herd->value.m_horses;
-        if(herd->value.m_horses != nullptr){
-            herd->value.m_horses->value.herd_previous = horse;
-        }
-        herd->value.m_horses = horse;
-        horse->value.herd_previous = nullptr;
-        horse->value.timestamp = herd->value.counter;
-        herd->value.counter++;
-        horse->value.herd = herd;
+        herd->value.joinHerd(horse);
+        horse->value.joinHerd(herd);
     }catch(...){
         return StatusType::ALLOCATION_ERROR;
     }
@@ -113,7 +104,8 @@ StatusType Plains::follow(int horseId, int horseToFollowId)
   horse_node_ptr follower = horses.search(Horse(horseId, 0)),
                  toFollow = horses.search(Horse(horseToFollowId, 0));
 
-  if (follower == nullptr || toFollow == nullptr || follower->value.herd != toFollow->value.herd)
+  if (follower == nullptr || toFollow == nullptr
+    || follower->value.getHerd() != toFollow->value.getHerd())
     return StatusType::FAILURE;
 
   follower->value.follow(toFollow);
@@ -126,28 +118,13 @@ StatusType Plains::leave_herd(int horseId)
         return StatusType::INVALID_INPUT;
     Horse current(horseId, 0);
     shared_ptr<AVLNode<Horse>> horse = horses.search(current);
-    if (horse == nullptr || horse->value.herd == nullptr)
+    if (horse == nullptr || horse->value.getHerd() == nullptr)
     {
         return StatusType::FAILURE;
     }
-    shared_ptr<AVLNode<Herd>> temp_herd = horse->value.herd;
-    if (temp_herd->value.m_horses == horse)
-    {
-        temp_herd->value.m_horses 
-        = temp_herd->value.m_horses->value.herd_next;
-    }
-    if (horse->value.herd_previous!= nullptr)
-    {
-        horse->value.herd_previous->value.herd_next
-         = horse->value.herd_next; 
-    }
-    if (horse->value.herd_next != nullptr)
-    {
-        horse->value.herd_next->value.herd_previous
-         = horse->value.herd_previous; 
-    }
-    horse->value.herd = nullptr;
-    horse->value.leader = nullptr;
+    herd_node_ptr temp_herd = horse->value.getHerd();
+    temp_herd->value.leaveHerd(horse->value.node);
+    horse->value.leaveHerd();
     if (temp_herd->value.m_horses == nullptr)
     {
         try{
@@ -186,15 +163,19 @@ output_t<bool> Plains::leads(int horseId, int otherHorseId)
 }
 
 bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
-    if (other->value.herd != horse->value.herd){
+    if (other->value.getHerd() != horse->value.getHerd()){
         return false;
     }
-    while (horse->value.getLeader() != nullptr)
+    int count = 0;
+    int n_herd = horse->value.getHerd()->value.getCount() - 1;
+    while (horse->value.getLeader() != nullptr 
+        && count < n_herd)
     {
         horse = horse->value.getLeader();
         if (horse == other){
             return true;
         }
+        count++;
     }
     return false;
  }

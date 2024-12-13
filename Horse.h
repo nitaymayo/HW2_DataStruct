@@ -12,16 +12,14 @@ class Horse {
 private:
     int ID;
     int speed;
-    std::time_t join_timestamp;
-    std::time_t following_timestamp;
-
-public:
-
-    std::shared_ptr<AVLNode<Horse>> herd_next;
-    std::shared_ptr<AVLNode<Horse>> herd_previous;
-    std::shared_ptr<AVLNode<Horse>> leader;
+    int join_timestamp;
+    int following_timestamp;
     std::shared_ptr<AVLNode<Herd>> herd;
-    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(-1), following_timestamp(-1) {};
+    std::shared_ptr<AVLNode<Horse>> leader;
+public:
+    shared_ptr<MyNode> node;
+
+    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(0) {};
 
     ~Horse() = default;
 
@@ -32,8 +30,11 @@ public:
         return speed;
     }
 
-    std::time_t getTimestamp() const {
+    int getTimestamp() const {
         return join_timestamp;
+    }
+    std::shared_ptr<AVLNode<Herd>> getHerd(){
+        return herd;
     }
 
     std::shared_ptr<AVLNode<Horse>> getLeader() const {
@@ -49,11 +50,17 @@ public:
         this->leader = leader;
     }
 
-    bool joinHerd(const std::shared_ptr<AVLNode<Herd>> &herd) {
-        if (this->herd->value == herd->value) return false;
-        time(&join_timestamp);
+    void joinHerd(const std::shared_ptr<AVLNode<Herd>> &herd) {
+        this->join_timestamp++;
         this->herd = herd;
-        return true;
+    }
+
+    void leaveHerd(){
+        this->node = nullptr;
+        this->herd = nullptr;
+        this->leader = nullptr;
+        this->join_timestamp++;
+        this->following_timestamp = 0;
     }
 };
 
