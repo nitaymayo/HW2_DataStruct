@@ -17,7 +17,14 @@ Plains::~Plains()
 
 StatusType Plains::add_herd(int herdId)
 {
-    return StatusType::FAILURE;
+  if (herdId <= 0) return StatusType::INVALID_INPUT;
+
+  Herd newHerd(herdId);
+  if (herds.search(newHerd) == nullptr) return StatusType::FAILURE;
+
+  if (empty_herds.insert(newHerd)) return StatusType::SUCCESS;
+
+  return StatusType::FAILURE;
 }
 
 StatusType Plains::remove_herd(int herdId)
