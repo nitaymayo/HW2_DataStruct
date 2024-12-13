@@ -3,6 +3,8 @@
 
 #include "plains25a1.h"
 
+typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
+typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
     
 Plains::Plains() : horses(AVLTree<Horse>()),
                    herds(AVLTree<Herd>()),
@@ -141,7 +143,12 @@ StatusType Plains::leave_herd(int horseId)
 
 output_t<int> Plains::get_speed(int horseId)
 {
-    return 0;
+    if (horseId <= 0) return output_t<int>(StatusType::INVALID_INPUT);
+
+    horse_node_ptr horse = horses.search(Horse(horseId, 0));
+    if (horse == nullptr) return output_t<int>(StatusType::FAILURE);
+
+    return output_t<int>(horse->value.getSpeed());
 }
 
 output_t<bool> Plains::leads(int horseId, int otherHorseId)
