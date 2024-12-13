@@ -5,8 +5,11 @@
 #ifndef HORSE_H
 #define HORSE_H
 #include <memory>
-#include "Herd.h"
-#include <chrono>
+// #include "Herd.h"
+
+
+struct MyNode;
+class Herd;
 
 class Horse {
 private:
@@ -18,7 +21,7 @@ private:
     std::shared_ptr<AVLNode<Horse>> leader;
 public:
 
-    shared_ptr<Herd::MyNode> node;
+    shared_ptr<MyNode> node;
 
     Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(0) {};
 
@@ -75,6 +78,11 @@ inline bool operator>(const Horse &h1, const Horse &h2) {
     return h1.getID() > h2.getID();
 }
 
-
+struct MyNode{
+    shared_ptr<AVLNode<Horse>> current_horse;
+    shared_ptr<MyNode> next;
+    shared_ptr<MyNode> previous;
+    int chain_num = -1;
+};
 
 #endif //HORSE_H

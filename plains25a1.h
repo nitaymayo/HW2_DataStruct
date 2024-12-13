@@ -30,7 +30,7 @@ private:
     AVLTree<Herd> empty_herds;
 
     bool has_leading_chain(shared_ptr<AVLNode<Horse>> horse1, shared_ptr<AVLNode<Horse>> horse2);
-    bool go_over_follow_chain(shared_ptr<Herd::MyNode> horse, shared_ptr<Herd::MyNode> leader, int chain_count);
+    bool go_over_follow_chain(shared_ptr<MyNode> horse, shared_ptr<MyNode> leader, int chain_count);
 public:
     // <DO-NOT-MODIFY> {
     /*

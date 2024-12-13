@@ -4,7 +4,11 @@
 
 #ifndef HERD_H
 #define HERD_H
-#include <memory>
+// #include <memory>
+// #include "AVLTree.h"
+//
+// class Horse;
+#include "Horse.h"
 
 
 class Herd {
@@ -12,13 +16,6 @@ class Herd {
     int counter;
 
 public:
-    friend class Horse;
-    struct MyNode{
-        shared_ptr<AVLNode<Horse>> current_horse;
-        shared_ptr<MyNode> next;
-        shared_ptr<MyNode> previous;
-        int chain_num = -1;
-    };
 
     shared_ptr<MyNode> m_horses;
     explicit Herd(const int ID): ID(ID), counter(0) {}

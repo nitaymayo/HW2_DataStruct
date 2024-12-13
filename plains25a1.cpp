@@ -190,7 +190,7 @@ output_t<bool> Plains::can_run_together(int herdId)
     herd_node_ptr herd = herds.search(Herd(herdId));
     if (herd == nullptr) return output_t<bool>(StatusType::FAILURE);
 
-    shared_ptr<Herd::MyNode> a_horse = herd->value.m_horses, leader = nullptr;
+    shared_ptr<MyNode> a_horse = herd->value.m_horses, leader = nullptr;
 
     // find leader and make sure there is only 1
     while (a_horse != nullptr){
@@ -217,10 +217,10 @@ output_t<bool> Plains::can_run_together(int herdId)
 
     return output_t<bool>(true);
 }
-bool go_over_follow_chain(shared_ptr<Herd::MyNode> horse,
-                          shared_ptr<AVLNode<Herd::MyNode>> leader,
+bool go_over_follow_chain(shared_ptr<MyNode> horse,
+                          shared_ptr<MyNode> leader,
                           int chain_count){
-  while (horse->current_horse->value.getLeader() != leader->current_horse &&
+  while (horse->current_horse->value.getLeader()->value != leader->current_horse->value &&
          horse->chain_num == -1){
 
     if (horse->chain_num == chain_count) return false;
