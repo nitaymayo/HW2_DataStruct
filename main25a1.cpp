@@ -17,21 +17,6 @@ void print(string cmd, StatusType res);
 void print(string cmd, output_t<int> res);
 void print(string cmd, output_t<bool> res);
 
-
-// // FOR TESTS #########
-// int main() {
-//     AVLTree<int> tree;
-//
-//     tree.insert(5);
-//     tree.insert(3);
-//     tree.insert(4);
-//
-//     tree.printInorder();
-//
-//
-// }
-//
-
 int main()
 {
 

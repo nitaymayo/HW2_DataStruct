@@ -182,6 +182,19 @@ bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
     return false;
  }
 
+bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
+                          shared_ptr<MyNode> leader,
+                          int chain_count){
+    while (horse->current_horse->value.getLeader()->value != leader->current_horse->value &&
+           horse->chain_num == -1){
+
+        if (horse->chain_num == chain_count) return false;
+
+        horse->chain_num = chain_count;
+        horse = horse->next;
+           }
+    return true;
+}
 
 output_t<bool> Plains::can_run_together(int herdId)
 {
@@ -217,16 +230,4 @@ output_t<bool> Plains::can_run_together(int herdId)
 
     return output_t<bool>(true);
 }
-bool go_over_follow_chain(shared_ptr<MyNode> horse,
-                          shared_ptr<MyNode> leader,
-                          int chain_count){
-  while (horse->current_horse->value.getLeader()->value != leader->current_horse->value &&
-         horse->chain_num == -1){
 
-    if (horse->chain_num == chain_count) return false;
-
-    horse->chain_num = chain_count;
-    horse = horse->next;
-    }
-  return true;
-}
