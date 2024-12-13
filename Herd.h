@@ -7,17 +7,19 @@
 #include <memory>
 
 
-struct MyNode{
-    shared_ptr<AVLNode<Horse>> current_horse;
-    shared_ptr<MyNode> next;
-    shared_ptr<MyNode> previous;
-};
-
 class Herd {
-    friend class Horse;
     int ID;
     int counter;
+
 public:
+    friend class Horse;
+    struct MyNode{
+        shared_ptr<AVLNode<Horse>> current_horse;
+        shared_ptr<MyNode> next;
+        shared_ptr<MyNode> previous;
+        int chain_num = -1;
+    };
+
     shared_ptr<MyNode> m_horses;
     explicit Herd(const int ID): ID(ID), counter(0) {}
 

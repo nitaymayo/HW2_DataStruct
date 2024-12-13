@@ -3,6 +3,8 @@
 
 #include "plains25a1.h"
 
+typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
+typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
 
 Plains::Plains() : horses(AVLTree<Horse>()),
                    herds(AVLTree<Herd>()),
@@ -183,5 +185,48 @@ bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
 
 output_t<bool> Plains::can_run_together(int herdId)
 {
-    return false;
+      if (herdId <= 0) return output_t<bool>(StatusType::INVALID_INPUT);
+
+    herd_node_ptr herd = herds.search(Herd(herdId));
+    if (herd == nullptr) return output_t<bool>(StatusType::FAILURE);
+
+    shared_ptr<Herd::MyNode> a_horse = herd->value.m_horses, leader = nullptr;
+
+    // find leader and make sure there is only 1
+    while (a_horse != nullptr){
+      // reset chain number field
+      a_horse->chain_num = -1;
+      if (a_horse->current_horse->value.getLeader() == nullptr){
+        // if no leader yet make a_horse leader
+        if (leader == nullptr) leader = a_horse;
+        // else there are more then 2 leaders so herd cant run
+        else return output_t<bool>(false);
+      }
+      a_horse = a_horse->next;
+    }
+
+    // iterate over herd and assign chain number
+    int chain_counter = 1;
+
+    a_horse = herd->value.m_horses;
+    while (a_horse != nullptr){
+      if (go_over_follow_chain(a_horse, leader, chain_counter)){
+        a_horse = a_horse->next;
+      } else return output_t<bool>(false);
+    }
+
+    return output_t<bool>(true);
+}
+bool go_over_follow_chain(shared_ptr<Herd::MyNode> horse,
+                          shared_ptr<AVLNode<Herd::MyNode>> leader,
+                          int chain_count){
+  while (horse->current_horse->value.getLeader() != leader->current_horse &&
+         horse->chain_num == -1){
+
+    if (horse->chain_num == chain_count) return false;
+
+    horse->chain_num = chain_count;
+    horse = horse->next;
+    }
+  return true;
 }

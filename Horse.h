@@ -17,7 +17,8 @@ private:
     std::shared_ptr<AVLNode<Herd>> herd;
     std::shared_ptr<AVLNode<Horse>> leader;
 public:
-    shared_ptr<MyNode> node;
+
+    shared_ptr<Herd::MyNode> node;
 
     Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(0) {};
 

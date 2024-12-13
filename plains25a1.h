@@ -18,8 +18,7 @@
 #include "Horse.h"
 #include "Herd.h"
 
-typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
-typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
+
 
 class Plains {
 private:
@@ -30,9 +29,8 @@ private:
     AVLTree<Herd> herds;
     AVLTree<Herd> empty_herds;
 
-
-    bool has_leading_chain(horse_node_ptr horse, horse_node_ptr other);
-    
+    bool has_leading_chain(shared_ptr<AVLNode<Horse>> horse1, shared_ptr<AVLNode<Horse>> horse2);
+    bool go_over_follow_chain(shared_ptr<Herd::MyNode> horse, shared_ptr<Herd::MyNode> leader, int chain_count);
 public:
     // <DO-NOT-MODIFY> {
     /*
