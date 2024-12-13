@@ -6,19 +6,21 @@
 #define HORSE_H
 #include <memory>
 #include "Herd.h"
+#include <chrono>
 
 class Horse {
 private:
     int ID;
     int speed;
+    std::time_t timestamp;
 
 public:
-    int timestamp = -1;
+
     std::shared_ptr<AVLNode<Horse>> herd_next;
     std::shared_ptr<AVLNode<Horse>> herd_previous;
     std::shared_ptr<AVLNode<Horse>> leader;
     std::shared_ptr<AVLNode<Herd>> herd;
-    Horse(const int ID, const int speed): ID(ID), speed(speed) {};
+    Horse(const int ID, const int speed): ID(ID), speed(speed), timestamp(-1) {};
 
     ~Horse() = default;
 
@@ -27,6 +29,12 @@ public:
     }
     int getSpeed() const {
         return speed;
+    }
+
+    void follow(const std::shared_ptr<AVLNode<Horse>>& leader) {
+        if (leader == nullptr) throw std::invalid_argument("Horse can't be null");
+        time(&timestamp);
+        this->leader = leader;
     }
 };
 

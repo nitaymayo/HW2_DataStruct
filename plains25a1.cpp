@@ -22,8 +22,11 @@ StatusType Plains::add_herd(int herdId)
   Herd newHerd(herdId);
   if (herds.search(newHerd) == nullptr) return StatusType::FAILURE;
 
-  if (empty_herds.insert(newHerd)) return StatusType::SUCCESS;
-
+  try{
+      if (empty_herds.insert(newHerd)) return StatusType::SUCCESS;
+  } catch(bad_alloc &e){
+    return StatusType::ALLOCATION_ERROR;
+  }
   return StatusType::FAILURE;
 }
 
@@ -105,7 +108,16 @@ StatusType Plains::join_herd(int horseId, int herdId)
 
 StatusType Plains::follow(int horseId, int horseToFollowId)
 {
+  if (horseId <=0 || horseToFollowId <= 0 || horseId == horseToFollowId) return StatusType::INVALID_INPUT;
+
+  horse_node_ptr follower = horses.search(Horse(horseId, 0)),
+                 toFollow = horses.search(Horse(horseToFollowId, 0));
+
+  if (follower == nullptr || toFollow == nullptr || follower->value.herd != toFollow->value.herd)
     return StatusType::FAILURE;
+
+  follower->value.follow(toFollow);
+  return StatusType::SUCCESS;
 }
 
 StatusType Plains::leave_herd(int horseId)
