@@ -23,7 +23,7 @@ public:
 
     shared_ptr<MyNode> node;
 
-    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(0) {};
+    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(-1) {};
 
     ~Horse() = default;
 
@@ -42,7 +42,7 @@ public:
     }
 
     std::shared_ptr<AVLNode<Horse>> getLeader() const {
-        if (leader != nullptr && following_timestamp == leader->value.getTimestamp()) {
+        if (leader != nullptr && following_timestamp == leader->value.getTimestamp() ) {
             return leader;
         }
         return nullptr;
@@ -64,7 +64,7 @@ public:
         this->herd = nullptr;
         this->leader = nullptr;
         this->join_timestamp++;
-        this->following_timestamp = 0;
+        this->following_timestamp = -1;
     }
 };
 
