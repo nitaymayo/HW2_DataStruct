@@ -32,6 +32,15 @@ private:
     bool has_leading_chain(shared_ptr<AVLNode<Horse>> horse1, shared_ptr<AVLNode<Horse>> horse2);
     bool go_over_follow_chain(shared_ptr<MyNode> horse, shared_ptr<MyNode> leader, int chain_count);
 public:
+
+    void printHorsesInorder() {
+     horses.printInorder();
+    };
+    void printHorsesPreorder() {
+     horses.printPreorder();
+    };
+
+
     // <DO-NOT-MODIFY> {
     /*
     Init 3 AVL trees for horse, herd, emptyherd
