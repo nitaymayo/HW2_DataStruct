@@ -262,7 +262,7 @@ template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T data) {
 
   // in case the node to delete doesnt exist in the tree return false
-  if (node == nullptr) return nullptr;
+  if (node == nullptr) throw logic_error("Data not found");
 
 
   if (node->data() > data) {
