@@ -191,11 +191,14 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
                           shared_ptr<MyNode> leader,
                           int chain_count){
     if (horse->current_horse->value.getLeader() == nullptr) return true;
-    while (horse->current_horse->value.getLeader()->value != leader->current_horse->value &&
-           horse->chain_num == -1){
-
+    // run on chain until you get to leader
+    while (horse->current_horse->value.getLeader()->value != leader->current_horse->value){
+        // if got back on current chain so a circle exist herd and cant run togather
         if (horse->chain_num == chain_count) return false;
-
+        // if got to an existing chain so horse is connected to leader so return true
+        if (horse->chain_num < chain_count &&
+            horse->chain_num != -1) break;
+        // update horse chain num and proceed to next horse
         horse->chain_num = chain_count;
         horse = horse->current_horse->value.getLeader()->value.node;
            }
