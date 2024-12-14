@@ -112,7 +112,8 @@ StatusType Plains::follow(int horseId, int horseToFollowId)
                  toFollow = horses.search(Horse(horseToFollowId, 0));
 
   if (follower == nullptr || toFollow == nullptr
-    || follower->value.getHerd() != toFollow->value.getHerd())
+    || follower->value.getHerd() == nullptr ||
+    follower->value.getHerd() != toFollow->value.getHerd())
     return StatusType::FAILURE;
 
   follower->value.follow(toFollow);
@@ -195,7 +196,7 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
     if (horse->current_horse->value.getLeader() == nullptr) return true;
     // run on chain until you get to leader
     while (horse->current_horse->value.getLeader()->value != leader->current_horse->value){
-        // if got back on current chain so a circle exist herd and cant run togather
+        // if got back on current chain so a circle exist in herd and they cant run togather
         if (horse->chain_num == chain_count) return false;
         // if got to an existing chain so horse is connected to leader so return true
         if (horse->chain_num < chain_count &&
