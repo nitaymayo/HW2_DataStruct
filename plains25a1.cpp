@@ -170,7 +170,9 @@ output_t<bool> Plains::leads(int horseId, int otherHorseId)
 }
 
 bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
-    if (other->value.getHerd() != horse->value.getHerd()){
+    if (!other->value.getHerd() ||
+        !horse->value.getHerd() ||
+        other->value.getHerd() != horse->value.getHerd()){
         return false;
     }
     int count = 0;
@@ -216,9 +218,9 @@ output_t<bool> Plains::can_run_together(int herdId)
 
     shared_ptr<MyNode> a_horse = herd->value.m_horses, leader = nullptr;
 
-    if (herd->value.getCount() == 1) return output_t<bool>(StatusType::SUCCESS);
+    if (herd->value.getCount() == 1) return output_t<bool>(true);
 
-    // find leader and make sure there is only 1
+    // find leader and make sure there is exactly 1
     while (a_horse != nullptr){
       // reset chain number field
       a_horse->chain_num = -1;
@@ -230,6 +232,7 @@ output_t<bool> Plains::can_run_together(int herdId)
       }
       a_horse = a_horse->next;
     }
+    if (!leader) return output_t<bool>(false);
 
     // iterate over herd and assign chain number
     int chain_counter = 1;
