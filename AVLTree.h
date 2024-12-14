@@ -18,7 +18,7 @@ public:
   shared_ptr<AVLNode<T>> right;
   int height;
 
-  explicit AVLNode(T k):value(k),left(nullptr),right(nullptr),height(1){}
+  explicit AVLNode(T k):value(k),left(),right(),height(1){}
 
   T data() {
     return value;
@@ -62,10 +62,20 @@ private:
 
   void printInorder(shared_ptr<AVLNode<T>> root)
   {
+    if (!root) {
+      return;
+    }
+    if (root->left) printInorder(root->left);
+    cout << root->data() << " ";
+    if (root->right) printInorder(root->right);
+  }
+
+  void printPreorder(shared_ptr<AVLNode<T>> root)
+  {
     if (root != nullptr) {
-      printInorder(root->left);
       cout << root->data() << " ";
-      printInorder(root->right);
+      printPreorder(root->left);
+      printPreorder(root->right);
     }
   }
 
@@ -88,6 +98,14 @@ public:
       printInorder(root->left);
       cout << root->data() << " ";
       printInorder(root->right);
+    }
+    cout << endl;
+  }
+  void printPreorder(){
+    if (root != nullptr) {
+      cout << root->data() << " ";
+      printPreorder(root->left);
+      printPreorder(root->right);
     }
     cout << endl;
   }
@@ -153,11 +171,11 @@ shared_ptr<AVLNode<T>> AVLTree<T>::fixWithRotations(shared_ptr<AVLNode<T>> node)
   int nodeBalanceFactor = balanceFactor(node);
 
   //  RR
-  if (nodeBalanceFactor == -2 && balanceFactor(node->right) >= 0){
+  if (nodeBalanceFactor == -2 && balanceFactor(node->right) == -1){
     return rotateLeft(node);
   }
   // LL
-  if (nodeBalanceFactor == 2 && balanceFactor(node->left) <= 0){
+  if (nodeBalanceFactor == 2 && balanceFactor(node->left) == 1){
     return rotateRight(node);
   }
   // RL
@@ -183,17 +201,18 @@ bool AVLTree<T>::insert(T data){
   try {
     if (this->root->data() > data){
       if (this->root->left == nullptr) this->root->left = make_shared<AVLNode<T>>(data);
-      else this->insert(this->root->left, data);
+      else  this->root->left = insert(this->root->left, data);
 
     } else if (this->root->data() < data){
       if (this->root->right == nullptr) this->root->right = make_shared<AVLNode<T>>(data);
-      else this->insert(this->root->right, data);
+      else this->root->right = insert(this->root->right, data);
     } else {
       return false;
     }
   } catch (logic_error &e) {
     return false;
   }
+  // root = fixWithRotations(root);
   return true;
 }
 
@@ -216,7 +235,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
   //update balance factor of this node
   node->height = 1 + max(height(node->left), height(node->right));
 
-  // fix the node with rotations
+  // fix the node with rotations and return new root
   return fixWithRotations(node);
 }
 
@@ -283,12 +302,12 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T dat
 template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::rotateLeft(shared_ptr<AVLNode<T>> node) {
   // save temp nodes
-  shared_ptr<AVLNode<T>> LR_sub_tree = node->right->left;
+  shared_ptr<AVLNode<T>> RL_sub_tree = node->right->left;
   shared_ptr<AVLNode<T>> R_node = node->right;
 
   // rotate
-  R_node->right = node;
-  node->left = LR_sub_tree;
+  R_node->left = node;
+  node->right = RL_sub_tree;
 
   // update height
   node->height = 1 + max(height(node->left), height(node->right));
@@ -301,12 +320,12 @@ shared_ptr<AVLNode<T>> AVLTree<T>::rotateLeft(shared_ptr<AVLNode<T>> node) {
 template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::rotateRight(shared_ptr<AVLNode<T>> node) {
   // save relevant nodes
-  shared_ptr<AVLNode<T>> LR_sub_tyree = node->right->left;
-  shared_ptr<AVLNode<T>> L_node = node->right;
+  shared_ptr<AVLNode<T>> LR_sub_tree = node->left->right;
+  shared_ptr<AVLNode<T>> L_node = node->left;
 
   // rotate
-  node->left = LR_sub_tyree;
   L_node->right = node;
+  node->left = LR_sub_tree;
 
   //update heights
   node->height = 1 + max(height(node->left), height(node->right));
