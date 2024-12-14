@@ -81,6 +81,11 @@ inline bool operator>(const Horse &h1, const Horse &h2) {
     return h1.getID() > h2.getID();
 }
 
+inline ostream &operator<<(ostream &os, const Horse &h) {
+    os << h.getID();
+    return os;
+}
+
 struct MyNode{
     shared_ptr<AVLNode<Horse>> current_horse;
     shared_ptr<MyNode> next;

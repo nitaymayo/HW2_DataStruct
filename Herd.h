@@ -59,6 +59,9 @@ public:
 inline bool operator==(const Herd& lhs, const Herd& rhs) {
     return lhs.getID() == rhs.getID();
 }
+inline bool operator!=(const Herd& lhs, const Herd& rhs) {
+    return !(lhs.getID() == rhs.getID());
+}
 inline bool operator<(const Herd& lhs, const Herd& rhs) {
     return lhs.getID() < rhs.getID();
 }
