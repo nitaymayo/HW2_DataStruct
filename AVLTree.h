@@ -171,11 +171,11 @@ shared_ptr<AVLNode<T>> AVLTree<T>::fixWithRotations(shared_ptr<AVLNode<T>> node)
   int nodeBalanceFactor = balanceFactor(node);
 
   //  RR
-  if (nodeBalanceFactor == -2 && balanceFactor(node->right) == -1){
+  if (nodeBalanceFactor == -2 && balanceFactor(node->right) <= 0){
     return rotateLeft(node);
   }
   // LL
-  if (nodeBalanceFactor == 2 && balanceFactor(node->left) == 1){
+  if (nodeBalanceFactor == 2 && balanceFactor(node->left) >= 0){
     return rotateRight(node);
   }
   // RL
