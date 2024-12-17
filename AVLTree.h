@@ -84,6 +84,19 @@ private:
 public:
   AVLTree():root(){};
 
+  // ~AVLTree(){
+  //   clearTree(root);
+  // }
+
+  // void clearTree(shared_ptr<AVLNode<T>> node){
+  //   if (node == nullptr)
+  //   {
+  //     return;
+  //   }
+  //   clearTree(node->left);
+  //   clearTree(node->right);
+  //   delete node.get();
+  // }
   //Nitay V
   bool insert(T data);
 
@@ -212,7 +225,8 @@ bool AVLTree<T>::insert(T data){
   } catch (logic_error &e) {
     return false;
   }
-  // root = fixWithRotations(root);
+  this->root->height = 1 + max(height(root->left), height(root->right));
+  root = fixWithRotations(root);
   return true;
 }
 
@@ -339,6 +353,8 @@ template<class T>
 int AVLTree<T>::height(shared_ptr<AVLNode<T>> node) {
   return node ? node->getHeight() : 0;
 }
+
+
 
 
 #endif //AVLTREE_H

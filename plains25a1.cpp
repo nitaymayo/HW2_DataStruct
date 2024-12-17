@@ -10,18 +10,15 @@ Plains::Plains() : horses(AVLTree<Horse>()),
                    herds(AVLTree<Herd>()),
                    empty_herds(AVLTree<Herd>()){}
 
-Plains::~Plains()
-{
-    
-}
+Plains::~Plains(){};
 
 StatusType Plains::add_herd(int herdId)
 {
   if (herdId <= 0) return StatusType::INVALID_INPUT;
 
   Herd newHerd(herdId);
-  if (herds.search(newHerd) != nullptr &&
-      empty_herds.search(newHerd))
+  if (herds.search(newHerd) != nullptr ||
+      empty_herds.search(newHerd) != nullptr)
       return StatusType::FAILURE;
 
   try{
@@ -136,8 +133,8 @@ StatusType Plains::leave_herd(int horseId)
     if (temp_herd->value.m_horses == nullptr)
     {
         try{
-            herds.deleteNode(temp_herd->data());
             empty_herds.insert(temp_herd->data());
+            herds.deleteNode(temp_herd->data());
         }catch(...){
             return StatusType::ALLOCATION_ERROR;
         }

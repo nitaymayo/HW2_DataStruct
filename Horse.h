@@ -41,20 +41,20 @@ public:
         return herd;
     }
 
-    std::shared_ptr<AVLNode<Horse>> getLeader() const {
+    std::shared_ptr<AVLNode<Horse>> getLeader() {
         if (leader != nullptr && following_timestamp == leader->value.getTimestamp() ) {
             return leader;
         }
         return nullptr;
     }
 
-    void follow(const std::shared_ptr<AVLNode<Horse>>& leader) {
+    void follow(std::shared_ptr<AVLNode<Horse>> leader) {
         if (leader == nullptr) throw std::invalid_argument("Horse can't be null");
         following_timestamp = leader->value.getTimestamp();
         this->leader = leader;
     }
 
-    void joinHerd(const std::shared_ptr<AVLNode<Herd>> &herd) {
+    void joinHerd(std::shared_ptr<AVLNode<Herd>> herd) {
         this->join_timestamp++;
         this->herd = herd;
     }
