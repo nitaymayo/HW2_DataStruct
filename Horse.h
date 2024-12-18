@@ -5,8 +5,6 @@
 #ifndef HORSE_H
 #define HORSE_H
 #include <memory>
-// #include "Herd.h"
-
 
 struct MyNode;
 class Herd;
@@ -17,11 +15,11 @@ private:
     int speed;
     int join_timestamp;
     int following_timestamp;
-    std::shared_ptr<AVLNode<Herd>> herd;
-    std::shared_ptr<AVLNode<Horse>> leader;
+    std::weak_ptr<AVLNode<Herd>> herd;
+    std::weak_ptr<AVLNode<Horse>> leader;
 public:
 
-    shared_ptr<MyNode> node;
+    weak_ptr<MyNode> node;
 
     Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(-1) {};
 
@@ -38,12 +36,12 @@ public:
         return join_timestamp;
     }
     std::shared_ptr<AVLNode<Herd>> getHerd(){
-        return herd;
+        return herd.lock();
     }
 
     std::shared_ptr<AVLNode<Horse>> getLeader() {
-        if (leader != nullptr && following_timestamp == leader->value.getTimestamp() ) {
-            return leader;
+        if (leader.lock() != nullptr && following_timestamp == leader.lock()->value.getTimestamp() ) {
+            return leader.lock();
         }
         return nullptr;
     }
@@ -60,9 +58,9 @@ public:
     }
 
     void leaveHerd(){
-        this->node = nullptr;
-        this->herd = nullptr;
-        this->leader = nullptr;
+        this->node.reset();
+        this->herd.reset();
+        this->leader.reset();
         this->join_timestamp++;
         this->following_timestamp = -1;
     }
@@ -89,7 +87,7 @@ inline ostream &operator<<(ostream &os, const Horse &h) {
 struct MyNode{
     shared_ptr<AVLNode<Horse>> current_horse;
     shared_ptr<MyNode> next;
-    shared_ptr<MyNode> previous;
+    weak_ptr<MyNode> previous;
     int chain_num = -1;
 };
 

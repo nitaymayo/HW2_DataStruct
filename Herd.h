@@ -4,10 +4,6 @@
 
 #ifndef HERD_H
 #define HERD_H
-// #include <memory>
-// #include "AVLTree.h"
-//
-// class Horse;
 #include "Horse.h"
 
 
@@ -20,7 +16,7 @@ public:
     shared_ptr<MyNode> m_horses;
     explicit Herd(const int ID): ID(ID), counter(0) {}
 
-
+    ~Herd() = default;
 
     int getID() const {
         return ID;
@@ -33,7 +29,7 @@ public:
         current->current_horse = horse;
         horse->value.node = current;
         current->next = m_horses;
-        current->previous = nullptr;
+        current->previous.reset();
         if (m_horses != nullptr) {
             m_horses->previous = current;
         }
@@ -42,16 +38,16 @@ public:
         return true;
     }
     void leaveHerd(shared_ptr<MyNode> node){
-        if (node->next != nullptr)
-        {
-            node->next->previous = node->previous;
+        if (node->next != nullptr){
+            node->next->pr #include "Herd.h"
+evious = node->previous;
         }
-        if (node->previous != nullptr)
-        {
-            node->previous->next = node->next;
-        }else if(node == m_horses){
+        auto previous = node->previous.lock();
+        if (previous)
+            previous->next = node->next;
+        else if(node == m_horses)
             m_horses = node->next;
-        }
+
         counter--;
     }
 };

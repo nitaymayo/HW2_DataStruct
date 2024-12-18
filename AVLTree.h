@@ -20,6 +20,8 @@ public:
 
   explicit AVLNode(T k):value(k),left(),right(),height(1){}
 
+  ~AVLNode() = default;
+
   T data() {
     return value;
   }
@@ -84,19 +86,8 @@ private:
 public:
   AVLTree():root(){};
 
-  // ~AVLTree(){
-  //   clearTree(root);
-  // }
+  ~AVLTree() = default;
 
-  // void clearTree(shared_ptr<AVLNode<T>> node){
-  //   if (node == nullptr)
-  //   {
-  //     return;
-  //   }
-  //   clearTree(node->left);
-  //   clearTree(node->right);
-  //   delete node.get();
-  // }
   //Nitay V
   bool insert(T data);
 
@@ -153,7 +144,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::minValueNode(shared_ptr<AVLNode<T>> node) {
 
 template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::search(T data) {
-  if (!((bool)this->root)) return nullptr;
+  if (this->root == nullptr) return nullptr;
 
   try {
     if (this->root->data() == data) return this->root;
@@ -236,7 +227,10 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
     return make_shared<AVLNode<T>>(data);
   }
 
-  if (node->data() == data) throw logic_error("data already exists");
+  if (node->data() == data) {
+    node.reset();
+    throw logic_error("data already exists");
+  }
 
   // recursive insertion of the new node
   if (data < node->data())
