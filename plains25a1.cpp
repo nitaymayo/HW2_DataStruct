@@ -9,44 +9,14 @@ int Herd::herd_num = 0;
 typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
 typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
 
-Plains::Plains() : empty_herds(AVLTree<Herd>()),
+Plains::Plains() : horses(AVLTree<Horse>()),
                    herds(AVLTree<Herd>()),
-                   horses(AVLTree<Horse>()){}
+                   empty_herds(AVLTree<Herd>()){}
 
 Plains::~Plains() {
-    // Explicitly clear AVLTree objects
-    empty_herds.~AVLTree();
-    herds.~AVLTree();
-    horses.~AVLTree();
-
-    // Ensure all Herds are cleaned up
-    // shared_ptr<AVLNode<Herd>> node;
-    // while ((node = herds.search(Herd(-1)))) { // Assume search returns nullptr when tree is empty
-    //     auto herd = node->value;
-    //     if (herd.m_horses) {
-    //         auto current = herd.m_horses;
-    //         while (current) {
-    //             auto next = current->next;
-    //             current->current_horse.reset();
-    //             current.reset();
-    //             current = next;
-    //         }
-    //     }
-    //     herds.deleteNode(herd);
-    // }
-
-    // // Ensure all Horses are cleaned up
-    // shared_ptr<AVLNode<Horse>> horse_node;
-    // while ((horse_node = horses.search(Horse(-1, 0)))) {
-    //     auto horse = horse_node->value;
-    //     horse.leaveHerd(); // Reset herd and leader references
-    //     horses.deleteNode(horse);
-    // }
-
-    // Clear any remaining references
-    empty_herds.~AVLTree();
-    herds.~AVLTree();
-    horses.~AVLTree();
+    empty_herds.clear();  // Assuming `clear` is implemented in AVLTree
+    herds.clear();
+    horses.clear();
 };
 
 StatusType Plains::add_herd(int herdId)
@@ -227,9 +197,9 @@ bool Plains::has_leading_chain(horse_node_ptr horse, horse_node_ptr other){
 bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
                           shared_ptr<MyNode> leader,
                           int chain_count){
-    if (horse->current_horse->value.getLeader() == nullptr) return true;
+    if (horse->getHorse()->value.getLeader() == nullptr) return true;
     // run on chain until you get to leader
-    while (horse->current_horse->value.getLeader()->value != leader->current_horse->value){
+    while (horse->getHorse()->value.getLeader()->value != leader->getHorse()->value){
         // if got back on current chain so a circle exist in herd and they cant run togather
         if (horse->chain_num == chain_count) return false;
         // if got to an existing chain so horse is connected to leader so return true
@@ -237,7 +207,7 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
             horse->chain_num != -1) break;
         // update horse chain num and proceed to next horse
         horse->chain_num = chain_count;
-        horse = horse->current_horse->value.getLeader()->value.node.lock();
+        horse = horse->getHorse()->value.getLeader()->value.node.lock();
            }
     horse->chain_num = chain_count;
     leader->chain_num = chain_count;
@@ -259,7 +229,7 @@ output_t<bool> Plains::can_run_together(int herdId)
     while (a_horse != nullptr){
       // reset chain number field
       a_horse->chain_num = -1;
-      if (a_horse->current_horse->value.getLeader() == nullptr){
+      if (a_horse->getHorse()->value.getLeader() == nullptr){
         // if no leader yet make a_horse leader
         if (leader == nullptr) leader = a_horse;
         // else there are more then 2 leaders so herd cant run

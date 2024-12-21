@@ -63,9 +63,10 @@ private:
 
   void clear(shared_ptr<AVLNode<T>> node) {
     if (node) {
-      clear(node->left);
-      clear(node->right);
+      auto left = node->left, right = node->right;
       node.reset();
+      clear(left);
+      clear(right);
     }
   }
 
@@ -94,9 +95,23 @@ public:
   AVLTree():root(){};
 
   ~AVLTree() {
-    clear(root);
-    root.reset();
+    if (root) {
+      auto left = root->left, right = root->right;
+      root.reset();
+      clear(left);
+      clear(right);
+    }
   };
+
+  void clear() {
+    if (root) {
+      auto left = root->left, right = root->right;
+      root.reset();
+      clear(left);
+      clear(right);
+    }
+  }
+
 
   //Nitay V
   bool insert(T &data);
@@ -106,10 +121,6 @@ public:
 
   //Nitay V
   bool deleteNode(T &data);
-
-  void clear() {
-    clear(root);
-  };
 
   void printInorder(){
     if (root != nullptr) {

@@ -18,7 +18,13 @@ public:
         herd_num++;
 }
     ~Herd() {
-        m_horses.reset();
+        auto current = m_horses;
+        while (current) {
+            auto next = current->next;
+            current->current_horse.reset();
+            current.reset();
+            current = next;
+        }
         cout << "Herd " << herd_num << " destroyed" << endl;
         herd_num--;
     };

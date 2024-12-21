@@ -92,13 +92,13 @@ inline ostream &operator<<(ostream &os, const Horse &h) {
 }
 
 struct MyNode{
-    shared_ptr<AVLNode<Horse>> current_horse;
+    weak_ptr<AVLNode<Horse>> current_horse;
     shared_ptr<MyNode> next;
     weak_ptr<MyNode> previous;
     int chain_num = -1;
-    ~MyNode() {
-        current_horse.reset();
-        next.reset();
+
+    shared_ptr<AVLNode<Horse>> getHorse() const {
+        return current_horse.lock();
     }
 };
 
