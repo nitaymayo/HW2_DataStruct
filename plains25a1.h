@@ -25,9 +25,9 @@ private:
     //
     // Here you may add anything you want
     //
-    AVLTree<Horse> horses;
-    AVLTree<Herd> herds;
     AVLTree<Herd> empty_herds;
+    AVLTree<Herd> herds;
+    AVLTree<Horse> horses;
 
     bool has_leading_chain(shared_ptr<AVLNode<Horse>> horse1, shared_ptr<AVLNode<Horse>> horse2);
     bool go_over_follow_chain(shared_ptr<MyNode> horse, shared_ptr<MyNode> leader, int chain_count);

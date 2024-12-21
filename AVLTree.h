@@ -22,7 +22,7 @@ public:
 
   ~AVLNode() {};
 
-  T data() {
+  T &data() {
     return value;
   }
   void setData(T data) {
@@ -54,12 +54,12 @@ private:
   shared_ptr<AVLNode<T>> minValueNode(shared_ptr<AVLNode<T>> node);
 
   //Nitay V
-  shared_ptr<AVLNode<T>> insert(shared_ptr<AVLNode<T>> node, T data);
+  shared_ptr<AVLNode<T>> insert(shared_ptr<AVLNode<T>> node, T &data);
 
   //Nitay V
-  shared_ptr<AVLNode<T>> deleteNode(shared_ptr<AVLNode<T>> node, T data);
+  shared_ptr<AVLNode<T>> deleteNode(shared_ptr<AVLNode<T>> node, T &data);
 
-  shared_ptr<AVLNode<T>> search(shared_ptr<AVLNode<T>> node, T data);
+  shared_ptr<AVLNode<T>> search(shared_ptr<AVLNode<T>> node, T &data);
 
   void clear(shared_ptr<AVLNode<T>> node) {
     if (node) {
@@ -99,13 +99,17 @@ public:
   };
 
   //Nitay V
-  bool insert(T data);
+  bool insert(T &data);
 
   //Zagoury
-  shared_ptr<AVLNode<T>> search(T data);
+  shared_ptr<AVLNode<T>> search(T &data);
 
   //Nitay V
-  bool deleteNode(T data);
+  bool deleteNode(T &data);
+
+  void clear() {
+    clear(root);
+  };
 
   void printInorder(){
     if (root != nullptr) {
@@ -153,7 +157,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::minValueNode(shared_ptr<AVLNode<T>> node) {
 }
 
 template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::search(T data) {
+shared_ptr<AVLNode<T>> AVLTree<T>::search(T &data) {
   if (this->root == nullptr) return nullptr;
 
   try {
@@ -168,7 +172,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::search(T data) {
 }
 
 template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::search(shared_ptr<AVLNode<T>> node, T data) {
+shared_ptr<AVLNode<T>> AVLTree<T>::search(shared_ptr<AVLNode<T>> node, T &data) {
   if (node == nullptr) throw logic_error("Data not found");
 
   if (node->data() == data) return node;
@@ -207,7 +211,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::fixWithRotations(shared_ptr<AVLNode<T>> node)
 }
 
 template<class T>
-bool AVLTree<T>::insert(T data){
+bool AVLTree<T>::insert(T &data){
   if (this->root == nullptr){
     this->root = make_shared<AVLNode<T>>(data);
     return true;
@@ -232,7 +236,7 @@ bool AVLTree<T>::insert(T data){
 }
 
 template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
+shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T &data){
   if (node == nullptr){
     return make_shared<AVLNode<T>>(data);
   }
@@ -258,7 +262,7 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T data){
 }
 
 template<class T>
-bool AVLTree<T>::deleteNode(T data) {
+bool AVLTree<T>::deleteNode(T &data) {
   try {
 
     if (this->root == nullptr) throw logic_error("Data not found");
@@ -277,7 +281,7 @@ bool AVLTree<T>::deleteNode(T data) {
 }
 
 template<class T>
-shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T data) {
+shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T &data) {
 
   // in case the node to delete doesnt exist in the tree return false
   if (node == nullptr) throw logic_error("Data not found");
@@ -291,13 +295,18 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T dat
     // this node should be deleted
     // case if node has no son
     if (node->left == nullptr && node->right == nullptr) {
+      node.reset();
       return nullptr;
-    } else if (node->left == nullptr) {
-      // node has only right son
-      return node->right;
     } else if (node->right == nullptr) {
       // node has only left son
-      return node->left;
+      auto leftSon = node->left;
+      node.reset();
+      return leftSon;
+    } else if (node->left == nullptr) {
+      // node has only right son
+      auto rightSon = node->right;
+      node.reset();
+      return rightSon;
     } else {
       // Node has 2 children
       // switch between the smallest right son and node

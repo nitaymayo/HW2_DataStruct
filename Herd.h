@@ -10,14 +10,17 @@
 class Herd {
     int ID;
     int counter;
-
+    static int herd_num;
 public:
 
     shared_ptr<MyNode> m_horses;
-    explicit Herd(const int ID): ID(ID), counter(0) {}
-
+    explicit Herd(const int ID): ID(ID), counter(0) {
+        herd_num++;
+}
     ~Herd() {
         m_horses.reset();
+        cout << "Herd " << herd_num << " destroyed" << endl;
+        herd_num--;
     };
 
     int getID() const {

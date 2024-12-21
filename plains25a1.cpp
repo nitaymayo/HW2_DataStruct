@@ -3,14 +3,51 @@
 
 #include "plains25a1.h"
 
+int Horse::horse_num = 0;
+int Herd::herd_num = 0;
+
 typedef shared_ptr<AVLNode<Horse>> horse_node_ptr;
 typedef shared_ptr<AVLNode<Herd>> herd_node_ptr;
 
-Plains::Plains() : horses(AVLTree<Horse>()),
+Plains::Plains() : empty_herds(AVLTree<Herd>()),
                    herds(AVLTree<Herd>()),
-                   empty_herds(AVLTree<Herd>()){}
+                   horses(AVLTree<Horse>()){}
 
-Plains::~Plains() = default;
+Plains::~Plains() {
+    // Explicitly clear AVLTree objects
+    empty_herds.~AVLTree();
+    herds.~AVLTree();
+    horses.~AVLTree();
+
+    // Ensure all Herds are cleaned up
+    // shared_ptr<AVLNode<Herd>> node;
+    // while ((node = herds.search(Herd(-1)))) { // Assume search returns nullptr when tree is empty
+    //     auto herd = node->value;
+    //     if (herd.m_horses) {
+    //         auto current = herd.m_horses;
+    //         while (current) {
+    //             auto next = current->next;
+    //             current->current_horse.reset();
+    //             current.reset();
+    //             current = next;
+    //         }
+    //     }
+    //     herds.deleteNode(herd);
+    // }
+
+    // // Ensure all Horses are cleaned up
+    // shared_ptr<AVLNode<Horse>> horse_node;
+    // while ((horse_node = horses.search(Horse(-1, 0)))) {
+    //     auto horse = horse_node->value;
+    //     horse.leaveHerd(); // Reset herd and leader references
+    //     horses.deleteNode(horse);
+    // }
+
+    // Clear any remaining references
+    empty_herds.~AVLTree();
+    herds.~AVLTree();
+    horses.~AVLTree();
+};
 
 StatusType Plains::add_herd(int herdId)
 {
@@ -103,9 +140,9 @@ StatusType Plains::join_herd(int horseId, int herdId)
 StatusType Plains::follow(int horseId, int horseToFollowId)
 {
   if (horseId <=0 || horseToFollowId <= 0 || horseId == horseToFollowId) return StatusType::INVALID_INPUT;
-
-  horse_node_ptr follower = horses.search(Horse(horseId, 0)),
-                 toFollow = horses.search(Horse(horseToFollowId, 0));
+    Horse horseFollower(horseId, 0), horseToFollow(horseToFollowId, 0);
+    horse_node_ptr follower = horses.search(horseFollower),
+                 toFollow = horses.search(horseToFollow);
 
   if (follower == nullptr || toFollow == nullptr
     || follower->value.getHerd() == nullptr ||
@@ -145,7 +182,8 @@ output_t<int> Plains::get_speed(int horseId)
 {
     if (horseId <= 0) return output_t<int>(StatusType::INVALID_INPUT);
 
-    horse_node_ptr horse = horses.search(Horse(horseId, 0));
+    Horse horseObj(horseId, 0);
+    horse_node_ptr horse = horses.search(horseObj);
     if (horse == nullptr) return output_t<int>(StatusType::FAILURE);
 
     return output_t<int>(horse->value.getSpeed());
@@ -209,8 +247,8 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
 output_t<bool> Plains::can_run_together(int herdId)
 {
       if (herdId <= 0) return output_t<bool>(StatusType::INVALID_INPUT);
-
-    herd_node_ptr herd = herds.search(Herd(herdId));
+    Herd herd_obj(herdId);
+    herd_node_ptr herd = herds.search(herd_obj);
     if (herd == nullptr) return output_t<bool>(StatusType::FAILURE);
 
     shared_ptr<MyNode> a_horse = herd->value.m_horses, leader = nullptr;

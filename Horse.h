@@ -17,13 +17,20 @@ private:
     int following_timestamp;
     std::weak_ptr<AVLNode<Herd>> herd;
     std::weak_ptr<AVLNode<Horse>> leader;
+    static int horse_num;
 public:
 
     weak_ptr<MyNode> node;
 
-    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(-1) {};
+    Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(-1) {
+        horse_num++;
+        cout << "Horse constructor " << horse_num << endl;
+    };
 
-    ~Horse() = default;
+    ~Horse() {
+        cout << "Horse destructor" << horse_num << endl;
+        horse_num--;
+    };
 
     int getID() const {
         return ID;
