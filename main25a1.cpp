@@ -19,12 +19,11 @@ void print(string cmd, output_t<bool> res);
 
 int main()
 {
-    
     int d1, d2;
 
     // Init
     Plains *obj = new Plains();
-    
+
     // Execute all commands in file
     string op;
     while (cin >> op)
@@ -67,7 +66,7 @@ int main()
         }
     }
 
-    // Quit 
+    // Quit
     delete obj;
     return 0;
 }

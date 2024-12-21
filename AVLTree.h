@@ -61,7 +61,7 @@ private:
 
   shared_ptr<AVLNode<T>> search(shared_ptr<AVLNode<T>> node, T &data);
 
-  void clear(shared_ptr<AVLNode<T>> node) {
+  void clear(shared_ptr<AVLNode<T>> &node) {
     if (node) {
       auto left = node->left, right = node->right;
       node.reset();

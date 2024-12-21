@@ -23,14 +23,9 @@ public:
     weak_ptr<MyNode> node;
 
     Horse(const int ID, const int speed): ID(ID), speed(speed), join_timestamp(0), following_timestamp(-1) {
-        horse_num++;
-        cout << "Horse constructor " << horse_num << endl;
     };
 
-    ~Horse() {
-        cout << "Horse destructor" << horse_num << endl;
-        horse_num--;
-    };
+    ~Horse() = default;
 
     int getID() const {
         return ID;

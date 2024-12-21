@@ -25,8 +25,6 @@ public:
             current.reset();
             current = next;
         }
-        cout << "Herd " << herd_num << " destroyed" << endl;
-        herd_num--;
     };
 
     int getID() const {
@@ -35,7 +33,7 @@ public:
     int getCount() const {return counter;}
 
 
-    bool joinHerd(shared_ptr<AVLNode<Horse>> horse){
+    bool joinHerd(shared_ptr<AVLNode<Horse>> &horse){
         shared_ptr<MyNode> current = make_shared<MyNode>();
         current->current_horse = horse;
         horse->value.node = current;
@@ -45,6 +43,7 @@ public:
             m_horses->previous = current;
         }
         m_horses = current;
+        current.reset();
         counter++;
         return true;
     }
