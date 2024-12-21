@@ -39,8 +39,7 @@ public:
     }
     void leaveHerd(shared_ptr<MyNode> node){
         if (node->next != nullptr){
-            node->next->pr #include "Herd.h"
-evious = node->previous;
+            node->next->previous = node->previous;
         }
         auto previous = node->previous.lock();
         if (previous)

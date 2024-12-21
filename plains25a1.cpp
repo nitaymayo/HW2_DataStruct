@@ -236,16 +236,7 @@ output_t<bool> Plains::can_run_together(int herdId)
 
     a_horse = herd->value.m_horses;
     while (a_horse != nullptr){
-      if (go_over_follow_cha
-  // void clearTree(shared_ptr<AVLNode<T>> node){
-  //   if (node == nullptr)
-  //   {
-  //     return;
-  //   }
-  //   clearTree(node->left);
-  //   clearTree(node->right);
-  //   delete node.get();
-  // }in(a_horse, leader, chain_counter)){
+      if (go_over_follow_chain(a_horse, leader, chain_counter)){
           a_horse = a_horse->next;
           chain_counter++;
       } else return output_t<bool>(false);
