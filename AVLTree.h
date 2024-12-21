@@ -20,7 +20,7 @@ public:
 
   explicit AVLNode(T k):value(k),left(),right(),height(1){}
 
-  ~AVLNode() = default;
+  ~AVLNode() {};
 
   T data() {
     return value;
@@ -61,6 +61,13 @@ private:
 
   shared_ptr<AVLNode<T>> search(shared_ptr<AVLNode<T>> node, T data);
 
+  void clear(shared_ptr<AVLNode<T>> node) {
+    if (node) {
+      clear(node->left);
+      clear(node->right);
+      node.reset();
+    }
+  }
 
   void printInorder(shared_ptr<AVLNode<T>> root)
   {
@@ -86,7 +93,10 @@ private:
 public:
   AVLTree():root(){};
 
-  ~AVLTree() = default;
+  ~AVLTree() {
+    clear(root);
+    root.reset();
+  };
 
   //Nitay V
   bool insert(T data);

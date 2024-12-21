@@ -89,6 +89,10 @@ struct MyNode{
     shared_ptr<MyNode> next;
     weak_ptr<MyNode> previous;
     int chain_num = -1;
+    ~MyNode() {
+        current_horse.reset();
+        next.reset();
+    }
 };
 
 #endif //HORSE_H

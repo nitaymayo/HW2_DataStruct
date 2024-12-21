@@ -16,7 +16,9 @@ public:
     shared_ptr<MyNode> m_horses;
     explicit Herd(const int ID): ID(ID), counter(0) {}
 
-    ~Herd() = default;
+    ~Herd() {
+        m_horses.reset();
+    };
 
     int getID() const {
         return ID;
