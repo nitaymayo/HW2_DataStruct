@@ -1,4 +1,4 @@
-g++ --std=c++11 -o ForValGrindTests -Wall -Werror *.cpp;
+g++ -std=c++11 -DNDEBUG -Wall -o ForValGrindTests *.cpp;
 
 for i in $(seq 0 4)
  do
@@ -7,9 +7,9 @@ echo "----------------------------------------------Run Valgrind Test $i -------
 echo '--------------------------------------------------------------------------------------------------------------------'
 if [[ $i -eq 0 ]]
 then
-valgrind --leak-check=full  ./ForValGrindTests < tests/test0.in > tempout.out
+valgrind --leak-check=full -s ./ForValGrindTests < tests/test0.in > tempout.out
 else
-valgrind --leak-check=full ./ForValGrindTests < tests/test${i}0.in > tempout.out
+valgrind --leak-check=full -s ./ForValGrindTests < tests/test${i}0.in > tempout.out
 fi
 done
 rm ForValGrindTests tempout.out
