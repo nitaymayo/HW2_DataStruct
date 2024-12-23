@@ -33,31 +33,44 @@ public:
     int getCount() const {return counter;}
 
 
-    bool joinHerd(shared_ptr<AVLNode<Horse>> &horse){
-        shared_ptr<MyNode> current = make_shared<MyNode>();
-        current->current_horse = horse;
-        horse->value.node = current;
-        current->next = m_horses;
-        current->previous.reset();
+    bool joinHerd(shared_ptr<Horse> &horse){
+        if (!horse) {
+            throw invalid_argument("Horse cannot be null");
+        }
+        shared_ptr<MyNode> current = make_shared<MyNode>(horse, m_horses, nullptr);
+        horse->node = current;
+
         if (m_horses != nullptr) {
             m_horses->previous = current;
         }
         m_horses = current;
-        current.reset();
+
         counter++;
         return true;
     }
     void leaveHerd(shared_ptr<MyNode> node){
+        // if node is first in the list
+        if (node->previous.lock() == nullptr) {
+            m_horses = node->next;;
+        } else {
+            // if node is inside the list
+            auto previous = node->previous.lock();
+            previous->next = node->next;
+            if (node->next) {
+                node->next->previous = previous;
+            }
+        }
+        node->next.reset();
+        node->current_horse.reset();
+        counter--;
+        /*
         if (node->next != nullptr){
             node->next->previous = node->previous;
         }
-        auto previous = node->previous.lock();
         if (previous)
             previous->next = node->next;
         else if(node == m_horses)
-            m_horses = node->next;
-
-        counter--;
+            m_horses = node->next;*/
     }
 };
 

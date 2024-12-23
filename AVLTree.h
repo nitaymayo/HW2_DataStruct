@@ -12,20 +12,20 @@ using namespace std;
 
 template<class T>
 class AVLNode {
+  shared_ptr<T> value;
 public:
-  T value;
   shared_ptr<AVLNode<T>> left;
   shared_ptr<AVLNode<T>> right;
   int height;
 
-  explicit AVLNode(T k):value(k),left(),right(),height(1){}
+  explicit AVLNode(T k):value(make_shared<T>(k)),left(),right(),height(1){}
 
   ~AVLNode() {};
 
-  T &data() {
+  shared_ptr<T> data() {
     return value;
   }
-  void setData(T data) {
+  void setData(shared_ptr<T> data) {
     this->value = data;
   }
   int getHeight() {
@@ -172,9 +172,9 @@ shared_ptr<AVLNode<T>> AVLTree<T>::search(T &data) {
   if (this->root == nullptr) return nullptr;
 
   try {
-    if (this->root->data() == data) return this->root;
+    if (*(this->root->data()) == data) return this->root;
 
-    if (this->root->data() > data) return this->root->left ? search(this->root->left, data) : nullptr;
+    if (*(this->root->data()) > data) return this->root->left ? search(this->root->left, data) : nullptr;
 
     return this->root->right ? search(this->root->right, data) : nullptr;
   } catch (logic_error &e) {
@@ -186,9 +186,10 @@ template<class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::search(shared_ptr<AVLNode<T>> node, T &data) {
   if (node == nullptr) throw logic_error("Data not found");
 
-  if (node->data() == data) return node;
+  if (*(node->data()) == data) return node;
 
-  if (node->data() > data) return search(node->left, data);
+  if (*(node->data()) > data) return search(node->left, data);
+ return search(node->left, data);
 
   return search(node->right, data);
 }
@@ -228,11 +229,11 @@ bool AVLTree<T>::insert(T &data){
     return true;
   }
   try {
-    if (this->root->data() > data){
+    if (*(this->root->data()) > data){
       if (this->root->left == nullptr) this->root->left = make_shared<AVLNode<T>>(data);
       else  this->root->left = insert(this->root->left, data);
 
-    } else if (this->root->data() < data){
+    } else if (*(this->root->data()) < data){
       if (this->root->right == nullptr) this->root->right = make_shared<AVLNode<T>>(data);
       else this->root->right = insert(this->root->right, data);
     } else {
@@ -252,15 +253,15 @@ shared_ptr<AVLNode<T>> AVLTree<T>::insert(shared_ptr<AVLNode<T>> node, T &data){
     return make_shared<AVLNode<T>>(data);
   }
 
-  if (node->data() == data) {
+  if (*(node->data()) == data) {
     node.reset();
     throw logic_error("data already exists");
   }
 
   // recursive insertion of the new node
-  if (data < node->data())
+  if (data < *(node->data()))
     node->left = insert(node->left, data);
-  else if (data > node->data())
+  else if (data > *(node->data()))
     node->right = insert(node->right, data);
   else
     return node;
@@ -278,9 +279,9 @@ bool AVLTree<T>::deleteNode(T &data) {
 
     if (this->root == nullptr) throw logic_error("Data not found");
 
-    if (this->root->data() == data) {
+    if (*(this->root->data()) == data) {
       this->root = deleteNode(this->root, data);
-    } else if (this->root->data() > data) {
+    } else if (*(this->root->data()) > data) {
       this->root->left = deleteNode(this->root->left, data);
     } else {
       this->root->right = deleteNode(this->root->right, data);
@@ -298,11 +299,11 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T &da
   if (node == nullptr) throw logic_error("Data not found");
 
 
-  if (node->data() > data) {
+  if (*(node->data()) > data) {
     node->left = deleteNode(node->left, data);
-  } else if (node->data() < data) {
+  } else if (*(node->data()) < data) {
     node->right = deleteNode(node->right, data);
-  } else if (node->data() == data) {
+  } else if (*(node->data()) == data) {
     // this node should be deleted
     // case if node has no son
     if (node->left == nullptr && node->right == nullptr) {
@@ -322,9 +323,12 @@ shared_ptr<AVLNode<T>> AVLTree<T>::deleteNode(shared_ptr<AVLNode<T>> node, T &da
       // Node has 2 children
       // switch between the smallest right son and node
       shared_ptr<AVLNode<T>> smallest_right_successor = minValueNode(node->right);
+      auto temp_value = node->data();
       node->setData(smallest_right_successor->data());
+      smallest_right_successor->setData(temp_value);
+
       // delete the smallest son (he is transferred to node location)
-      node->right = deleteNode(node->right, smallest_right_successor->data());
+      node->right = deleteNode(node->right, *temp_value);
     }
 
     if (node == nullptr) return nullptr;

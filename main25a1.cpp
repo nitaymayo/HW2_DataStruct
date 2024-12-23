@@ -28,7 +28,9 @@ int main()
     string op;
     while (cin >> op)
     {
-        if (!op.compare("add_herd")) {
+        if (!op.compare("break")) {
+            cout << "break" << endl;
+        } else if (!op.compare("add_herd")) {
             cin >> d1;
             print(op, obj->add_herd(d1));
         } else if (!op.compare("remove_herd")) {
@@ -54,6 +56,7 @@ int main()
             print(op, obj->leads(d1, d2));
         } else if (!op.compare("can_run_together")) {
             cin >> d1;
+
             print(op, obj->can_run_together(d1));
         } else {
             cout << "Unknown command: " << op << endl;

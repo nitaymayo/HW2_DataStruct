@@ -5,6 +5,7 @@
 #ifndef HORSE_H
 #define HORSE_H
 #include <memory>
+#include <utility>
 
 struct MyNode;
 class Herd;
@@ -15,8 +16,8 @@ private:
     int speed;
     int join_timestamp;
     int following_timestamp;
-    std::weak_ptr<AVLNode<Herd>> herd;
-    std::weak_ptr<AVLNode<Horse>> leader;
+    std::shared_ptr<Herd> herd;
+    std::weak_ptr<Horse> leader;
     static int horse_num;
 public:
 
@@ -37,24 +38,25 @@ public:
     int getTimestamp() const {
         return join_timestamp;
     }
-    std::shared_ptr<AVLNode<Herd>> getHerd(){
-        return herd.lock();
+    std::shared_ptr<Herd> getHerd(){
+        return herd;
     }
 
-    std::shared_ptr<AVLNode<Horse>> getLeader() {
-        if (leader.lock() != nullptr && following_timestamp == leader.lock()->value.getTimestamp() ) {
+    std::shared_ptr<Horse> getLeader() {
+        if (leader.lock() == nullptr) return nullptr;
+        if (leader.lock() != nullptr && following_timestamp == leader.lock()->getTimestamp() ) {
             return leader.lock();
         }
         return nullptr;
     }
 
-    void follow(std::shared_ptr<AVLNode<Horse>> leader) {
+    void follow(std::shared_ptr<Horse> leader) {
         if (leader == nullptr) throw std::invalid_argument("Horse can't be null");
-        following_timestamp = leader->value.getTimestamp();
+        following_timestamp = leader->getTimestamp();
         this->leader = leader;
     }
 
-    void joinHerd(std::shared_ptr<AVLNode<Herd>> herd) {
+    void joinHerd(const std::shared_ptr<Herd> &herd) {
         this->join_timestamp++;
         this->herd = herd;
     }
@@ -87,12 +89,20 @@ inline ostream &operator<<(ostream &os, const Horse &h) {
 }
 
 struct MyNode{
-    weak_ptr<AVLNode<Horse>> current_horse;
+    weak_ptr<Horse> current_horse;
+    int horse_ID;
     shared_ptr<MyNode> next;
     weak_ptr<MyNode> previous;
     int chain_num = -1;
 
-    shared_ptr<AVLNode<Horse>> getHorse() const {
+    MyNode(const shared_ptr<Horse> &horse,
+            const shared_ptr<MyNode> &next,
+            const shared_ptr<MyNode> &previous):current_horse(horse),
+                                        horse_ID(horse->getID()),
+                                        next(next),
+                                        previous(previous){}
+
+    shared_ptr<Horse> getHorse() const {
         return current_horse.lock();
     }
 };
