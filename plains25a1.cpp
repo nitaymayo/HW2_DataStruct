@@ -72,7 +72,7 @@ StatusType Plains::add_horse(int horseId, int speed)
 
 StatusType Plains::join_herd(int horseId, int herdId)
 {
-    Herd temp(2002);
+    Herd temp(2003);
     auto herdtemp = herds.search(temp);
 
     if(horseId <=0 || herdId <= 0)
@@ -96,15 +96,15 @@ StatusType Plains::join_herd(int horseId, int herdId)
         if (herd == nullptr)
         {
             return StatusType::FAILURE;
-        } else {
-            try{
-                herds.insert(*herd);
-                empty_herds.deleteNode(*herd);
-            }catch(...){
-                return StatusType::ALLOCATION_ERROR;
-            }
-            herd = herds.search(h1) ? herds.search(h1)->data() : nullptr;
-        } 
+        }
+        try{
+            if (!herds.insert(*herd))
+                cout << "failed to insert herd" << endl;
+            empty_herds.deleteNode(*herd);
+        }catch(...){
+            return StatusType::ALLOCATION_ERROR;
+        }
+        herd = herds.search(h1) ? herds.search(h1)->data() : nullptr;
     }
 
     try{
@@ -212,7 +212,7 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
                           shared_ptr<MyNode> leader,
                           int chain_count){
     if (horse->getHorse()->getLeader() == nullptr) return true;
-    // run on chain until you get to leader
+    // run on chain untiinsert(node->right, data)l you get to leader
     while (horse->getHorse()->getLeader() != leader->getHorse()){
         // if got back on current chain so a circle exist in herd and they cant run togather
         if (horse->chain_num == chain_count) return false;

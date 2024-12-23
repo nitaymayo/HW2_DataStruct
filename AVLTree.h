@@ -189,7 +189,6 @@ shared_ptr<AVLNode<T>> AVLTree<T>::search(shared_ptr<AVLNode<T>> node, T &data) 
   if (*(node->data()) == data) return node;
 
   if (*(node->data()) > data) return search(node->left, data);
- return search(node->left, data);
 
   return search(node->right, data);
 }
