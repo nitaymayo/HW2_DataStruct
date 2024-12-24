@@ -38,9 +38,6 @@ StatusType Plains::add_herd(int herdId)
 
 StatusType Plains::remove_herd(int herdId)
 {
-    Herd temp(2002);
-    auto herdtemp = herds.search(temp);
-
     if(herdId <=0)
         return StatusType::INVALID_INPUT;
     Herd h1(herdId);
@@ -72,41 +69,40 @@ StatusType Plains::add_horse(int horseId, int speed)
 
 StatusType Plains::join_herd(int horseId, int herdId)
 {
-    Herd temp(2003);
-    auto herdtemp = herds.search(temp);
-
     if(horseId <=0 || herdId <= 0)
         return StatusType::INVALID_INPUT;
     Horse current(horseId, 0);
-    horse_node_ptr horse = horses.search(current) ? horses.search(current)->data() : nullptr;
+    shared_ptr<AVLNode<Horse>> temp_horse = horses.search(current);
+    if (temp_horse == nullptr){
+        return StatusType::FAILURE;
+    }
+    horse_node_ptr horse = temp_horse->data();
     if (horse == nullptr || horse->getHerd() != nullptr)
     {
         return StatusType::FAILURE;
     }
-
     Herd h1(herdId);
-    herd_node_ptr herd = herds.search(h1) ? herds.search(h1)->data() : nullptr;
-
+    shared_ptr<AVLNode<Herd>> temp_herd = herds.search(h1);
+    herd_node_ptr herd = temp_herd != nullptr ? temp_herd->data() : nullptr;
     // if no herd in herds
     if (herd == nullptr)
     {
         // check if herd exists in empty_herds
-        herd = empty_herds.search(h1) ? empty_herds.search(h1)->data() : nullptr;
+        temp_herd =  empty_herds.search(h1);
+        herd = temp_herd != nullptr ? temp_herd->data() : nullptr;
         // if not then Failure
         if (herd == nullptr)
         {
             return StatusType::FAILURE;
         }
         try{
-            if (!herds.insert(*herd))
-                cout << "failed to insert herd" << endl;
+            herds.insert(*herd);
             empty_herds.deleteNode(*herd);
         }catch(...){
             return StatusType::ALLOCATION_ERROR;
         }
-        herd = herds.search(h1) ? herds.search(h1)->data() : nullptr;
+        herd = herds.search(h1)->data();
     }
-
     try{
         herd->joinHerd(horse);
         horse->joinHerd(herd);
@@ -118,29 +114,33 @@ StatusType Plains::join_herd(int horseId, int herdId)
 
 StatusType Plains::follow(int horseId, int horseToFollowId)
 {
-  if (horseId <=0 || horseToFollowId <= 0 || horseId == horseToFollowId) return StatusType::INVALID_INPUT;
+    if (horseId <=0 || horseToFollowId <= 0 || horseId == horseToFollowId)
+        return StatusType::INVALID_INPUT;
     Horse horseFollower(horseId, 0), horseToFollow(horseToFollowId, 0);
-    horse_node_ptr follower = horses.search(horseFollower) ? horses.search(horseFollower)->data() : nullptr,
-                 toFollow = horses.search(horseToFollow) ? horses.search(horseToFollow)->data() : nullptr;
+    shared_ptr<AVLNode<Horse>> temp_horse = horses.search(horseFollower);
+    shared_ptr<AVLNode<Horse>> temp_other = horses.search(horseToFollow);
+    if (temp_horse == nullptr || temp_other == nullptr){
+        return StatusType::FAILURE;
+    }
+    horse_node_ptr horse = temp_horse->data();
+    horse_node_ptr toFollow = temp_other->data();
+    if (horse->getHerd() == nullptr || horse->getHerd() != toFollow->getHerd())
+        return StatusType::FAILURE;
 
-  if (follower == nullptr || toFollow == nullptr
-    || follower->getHerd() == nullptr ||
-    follower->getHerd() != toFollow->getHerd())
-    return StatusType::FAILURE;
-
-  follower->follow(toFollow);
-  return StatusType::SUCCESS;
+    horse->follow(toFollow);
+    return StatusType::SUCCESS;
 }
 
 StatusType Plains::leave_herd(int horseId)
 {
-    Herd temp(2002);
-    auto herdtemp = herds.search(temp);
-
     if(horseId <=0)
         return StatusType::INVALID_INPUT;
     Horse current(horseId, 0);
-    horse_node_ptr horse = horses.search(current) ? horses.search(current)->data() : nullptr;
+    shared_ptr<AVLNode<Horse>> temp_horse = horses.search(current);
+    if (temp_horse == nullptr){
+        return StatusType::FAILURE;
+    }
+    horse_node_ptr horse = temp_horse->data();
     if (horse == nullptr || horse->getHerd() == nullptr)
     {
         return StatusType::FAILURE;
@@ -164,8 +164,12 @@ output_t<int> Plains::get_speed(int horseId)
 {
     if (horseId <= 0) return output_t<int>(StatusType::INVALID_INPUT);
 
-    Horse horseObj(horseId, 0);
-    horse_node_ptr horse = horses.search(horseObj) ? horses.search(horseObj)->data() : nullptr;
+    Horse current(horseId, 0);
+    shared_ptr<AVLNode<Horse>> temp_horse = horses.search(current);
+    if (temp_horse == nullptr){
+        return StatusType::FAILURE;
+    }
+    horse_node_ptr horse = temp_horse->data();
     if (horse == nullptr) return output_t<int>(StatusType::FAILURE);
 
     return output_t<int>(horse->getSpeed());
@@ -173,18 +177,18 @@ output_t<int> Plains::get_speed(int horseId)
 
 output_t<bool> Plains::leads(int horseId, int otherHorseId)
 {
-    Herd temp(2002);
-    auto herdtemp = herds.search(temp);
     if(horseId <=0 || otherHorseId <= 0 || horseId == otherHorseId)
         return StatusType::INVALID_INPUT;
     Horse h1(horseId, 0);
-    horse_node_ptr horse = horses.search(h1) ? horses.search(h1)->data() : nullptr;
+    shared_ptr<AVLNode<Horse>> temp_horse = horses.search(h1);
     Horse h2(otherHorseId, 0);
-    horse_node_ptr other = horses.search(h2) ? horses.search(h2)->data() : nullptr;
-    if (horse == nullptr || other == nullptr)
+    shared_ptr<AVLNode<Horse>> temp_other = horses.search(h2);
+    if (temp_horse == nullptr || temp_other == nullptr)
     {
         return StatusType::FAILURE;
     }
+    horse_node_ptr horse = temp_horse->data();
+    horse_node_ptr other = temp_other->data();
     return has_leading_chain(horse, other);
 }
 
@@ -230,16 +234,17 @@ bool Plains::go_over_follow_chain(shared_ptr<MyNode> horse,
 
 output_t<bool> Plains::can_run_together(int herdId)
 {
-      if (herdId <= 0) return output_t<bool>(StatusType::INVALID_INPUT);
+    if (herdId <= 0)
+        return output_t<bool>(StatusType::INVALID_INPUT);
+        
     Herd herd_obj(herdId);
-    herd_node_ptr herd = herds.search(herd_obj) ? herds.search(herd_obj)->data() : nullptr;
+    shared_ptr<AVLNode<Herd>> temp_herd = herds.search(herd_obj);
+    herd_node_ptr herd = temp_herd ? temp_herd->data() : nullptr;
+
     if (herd == nullptr) return output_t<bool>(StatusType::FAILURE);
 
     shared_ptr<MyNode> a_horse = herd->m_horses, leader = nullptr;
-    if (herdId == 2002 && a_horse->horse_ID == 20) {
-        Horse temp(20,0);
-        auto temphorse = horses.search(temp);
-    }
+
     if (herd->getCount() == 1) return output_t<bool>(true);
 
     // find leader and make sure there is exactly 1
@@ -269,4 +274,3 @@ output_t<bool> Plains::can_run_together(int herdId)
 
     return output_t<bool>(true);
 }
-

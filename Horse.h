@@ -43,9 +43,10 @@ public:
     }
 
     std::shared_ptr<Horse> getLeader() {
-        if (leader.lock() == nullptr) return nullptr;
-        if (leader.lock() != nullptr && following_timestamp == leader.lock()->getTimestamp() ) {
-            return leader.lock();
+        shared_ptr<Horse> temp_leader = leader.lock(); 
+        if (temp_leader == nullptr) return nullptr;
+        if (following_timestamp == temp_leader->getTimestamp() ) {
+            return temp_leader;
         }
         return nullptr;
     }

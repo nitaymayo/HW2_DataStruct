@@ -28,9 +28,7 @@ int main()
     string op;
     while (cin >> op)
     {
-        if (!op.compare("break")) {
-            cout << "break" << endl;
-        } else if (!op.compare("add_herd")) {
+        if (!op.compare("add_herd")) {
             cin >> d1;
             print(op, obj->add_herd(d1));
         } else if (!op.compare("remove_herd")) {
